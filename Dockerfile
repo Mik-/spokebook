@@ -10,7 +10,8 @@ RUN CGO_ENABLED=0 go build -trimpath \
  && mkdir /out/data
 
 # Run: distroless, no shell, runs as nonroot (65532) unless the platform overrides the user.
-FROM gcr.io/distroless/static-debian13:nonroot
+# Pinned by digest so Dependabot proposes a rebuild when the base image gets fixes.
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:25ac8f0c3b2334a9eb05452266bd4697864a8c8ef0ef71e5e6480d7f92868329
 ARG VERSION=dev
 LABEL org.opencontainers.image.title="Spokebook" \
       org.opencontainers.image.source="https://github.com/spokebook/spokebook" \

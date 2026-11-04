@@ -141,6 +141,7 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 a patch release, `feat:` to a minor release, and a `BREAKING CHANGE:` footer to a major release.
 Releases are made by [semantic-release](https://semantic-release.gitbook.io) on every push to `main`,
 which also builds and pushes the image.
+Dependabot proposes updates of the Go modules, base images and actions once a week.
 
 Please report security problems privately, see [SECURITY.md](SECURITY.md).
 
