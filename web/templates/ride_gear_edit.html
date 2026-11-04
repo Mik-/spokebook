@@ -1,0 +1,19 @@
+{{define "title"}}{{gearName .Gear.GearKey .Gear.Name}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/rides">{{t "rides.title"}}</a></li><li><a href="/ride-gears">{{t "rides.gears"}}</a></li><li>{{gearName .Gear.GearKey .Gear.Name}}</li></ul></nav>
+<h1>{{gearName .Gear.GearKey .Gear.Name}}</h1>
+<p><small>{{t (print "rides.source." .Gear.Source)}}</small></p>
+<form method="post" action="/ride-gears/{{.Gear.ID}}">
+  <label>{{t "rides.col.bike"}}
+    <select name="bike">
+      <option value="">{{t "rides.unassigned"}}</option>
+      {{range .Bikes}}<option value="{{.ID}}"{{if eq .ID ($.Form.Get "bike")}} selected{{end}}>{{.Name}}</option>{{end}}
+    </select>
+  </label>
+  <label><input type="checkbox" name="existing" value="1"{{if .Form.Get "existing"}} checked{{end}}> {{t "rides.gear.existing"}}</label>
+  <small>{{t "rides.gear.existing_hint"}}</small>
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+<div class="actions end"><a href="/ride-gears/{{.Gear.ID}}/delete" role="button" class="outline danger">{{t "rides.gear.delete"}}</a></div>
+{{end}}

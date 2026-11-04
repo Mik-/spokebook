@@ -1,0 +1,24 @@
+{{define "title"}}{{t "rides.import.title"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/rides">{{t "rides.title"}}</a></li><li>{{t "rides.import.title"}}</li></ul></nav>
+<h1>{{t "rides.import.title"}}</h1>
+{{template "error" .}}
+{{template "file-errors" .FileErrors}}
+<p>{{t "rides.import.intro"}}</p>
+<p><small>{{t "rides.import.sports"}}</small></p>
+<form method="post" action="/rides/import" enctype="multipart/form-data">
+  <label>{{t "rides.import.field.files"}}<span class="req" aria-hidden="true">*</span>
+    <input type="file" name="files" accept=".fit,.gpx,.tcx,.gz" multiple required>
+    <small>{{t "rides.import.files_hint" .MaxMB}}</small>
+  </label>
+  <label>{{t "rides.import.field.bike"}}
+    <select name="bike">
+      <option value="">{{t "rides.unassigned"}}</option>
+      {{range .Bikes}}<option value="{{.ID}}"{{if eq .ID ($.Form.Get "bike")}} selected{{end}}>{{.Name}}</option>{{end}}
+    </select>
+    <small>{{t "rides.import.bike_hint"}}</small>
+  </label>
+  <button type="submit">{{t "rides.import.preview"}}</button>
+</form>
+{{end}}

@@ -1,0 +1,26 @@
+{{define "title"}}{{t "maintenance.add_steps"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.Bike.ID}}">{{.Bike.Name}}</a></li><li><a href="/maintenances/{{.M.ID}}">{{template "maintenance-name" .M}}</a></li><li>{{t "maintenance.add_steps"}}</li></ul></nav>
+<h1>{{t "maintenance.add_steps"}}</h1>
+{{template "error" .}}
+{{if .Phases}}
+<form method="post" action="/maintenances/{{.M.ID}}/steps">
+  {{range .Phases}}
+  <details class="phase"{{if .Open}} open{{end}}>
+    <summary><h2>{{t (print "phase." .Phase)}}</h2> <small>{{tn "steps.count" .Count}}</small></summary>
+    <fieldset>
+    {{range .Groups}}
+    {{with .Assembly}}<h3 class="assembly">{{t (print "assembly." .)}}</h3>{{end}}
+    {{range .Steps}}<label><input type="checkbox" name="step" value="{{.ID}}"{{if has (index $.Form "step") .ID}} checked{{end}}> {{.Title}}{{if not .Levels}} <small>({{t "level.on_demand"}})</small>{{end}}</label>{{end}}
+    {{end}}
+    </fieldset>
+  </details>
+  {{end}}
+  <small>{{t "maintenance.add_steps.hint"}}</small>
+  <button type="submit">{{t "maintenance.add_steps"}}</button>
+</form>
+{{else}}
+<p>{{t "maintenance.all_steps_added"}}</p>
+{{end}}
+{{end}}

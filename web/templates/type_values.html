@@ -1,0 +1,12 @@
+{{define "title"}}{{t "types.values"}}: {{.Type.Name}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/components">{{t "components.title"}}</a></li><li><a href="/component-types">{{t "types.title"}}</a></li><li>{{.Type.Name}}</li></ul></nav>
+<h1>{{t "types.values"}}: {{.Type.Name}}</h1>
+{{template "error" .}}
+<p><small>{{t "types.values.hint"}}</small></p>
+<form method="post" action="/component-types/{{.Type.ID}}/values">
+  {{template "value-fields" .}}
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+{{end}}

@@ -1,0 +1,33 @@
+{{define "title"}}{{t "installation.edit"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/components">{{t "components.title"}}</a></li><li><a href="/components/{{.I.ComponentID}}">{{t "action.back"}}</a></li><li>{{t "installation.edit"}}</li></ul></nav>
+<h1>{{t "installation.edit"}}</h1>
+{{template "error" .}}
+<form method="post" action="/installations/{{.I.ID}}">
+  <div class="grid">
+    <label>{{t "component.field.bike"}}<span class="req" aria-hidden="true">*</span>
+      <select name="bike" required>
+        {{range .Bikes}}<option value="{{.ID}}"{{if eq .ID ($.Form.Get "bike")}} selected{{end}}>{{.Name}}</option>{{end}}
+      </select>
+    </label>
+    <label>{{t "component.field.position"}}
+      <select name="position">
+        <option value="">–</option>
+        {{range .Positions}}<option value="{{.}}"{{if eq . ($.Form.Get "position")}} selected{{end}}>{{t (print "position." .)}}</option>{{end}}
+      </select>
+    </label>
+  </div>
+  <div class="grid">
+    <label>{{t "component.field.installed_at"}}<span class="req" aria-hidden="true">*</span> <input type="date" name="installed_at" value="{{.Form.Get "installed_at"}}" required></label>
+    <label>{{t "component.field.odometer_km"}} <input type="number" name="installed_km" min="0" step="0.1" inputmode="decimal" value="{{.Form.Get "installed_km"}}"></label>
+  </div>
+  <div class="grid">
+    <label>{{t "component.field.removed_at"}} <input type="date" name="removed_at" value="{{.Form.Get "removed_at"}}"></label>
+    <label>{{t "component.field.odometer_km"}} <input type="number" name="removed_km" min="0" step="0.1" inputmode="decimal" value="{{.Form.Get "removed_km"}}"></label>
+  </div>
+  <small>{{t "installation.removal_hint"}}</small>
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+<div class="actions end"><a href="/installations/{{.I.ID}}/delete" role="button" class="outline danger">{{t "installation.delete"}}</a></div>
+{{end}}

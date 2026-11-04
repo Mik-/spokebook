@@ -1,0 +1,12 @@
+{{define "title"}}{{t "step.edit"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/steps">{{t "steps.title"}}</a></li><li><a href="/steps/{{.Step.ID}}">{{.Step.Title}}</a></li><li>{{t "action.edit"}}</li></ul></nav>
+<h1>{{t "step.edit"}}</h1>
+{{template "error" .}}
+<form method="post" action="/steps/{{.Step.ID}}">
+  {{template "step-fields" .}}
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+<div class="actions end"><a href="/steps/{{.Step.ID}}/delete" role="button" class="outline danger">{{t "step.delete"}}</a></div>
+{{end}}

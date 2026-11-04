@@ -1,0 +1,64 @@
+{{define "title"}}{{t "rides.preview.title"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/rides">{{t "rides.title"}}</a></li><li><a href="/rides/import">{{t "rides.import.title"}}</a></li><li>{{t "rides.preview.title"}}</li></ul></nav>
+<h1>{{t "rides.preview.title"}}</h1>
+{{template "file-errors" .FileErrors}}
+<form method="post" action="/rides/import/confirm">
+  <input type="hidden" name="default_bike" value="{{.DefaultBike}}">
+  {{with .Gears}}
+  <section>
+    <h2>{{t "rides.preview.gears"}}</h2>
+    <p><small>{{t "rides.preview.gears_hint"}}</small></p>
+    <div class="overflow-auto">
+    <table class="import-rows">
+      <thead><tr><th>{{t "rides.gear.col.source"}}</th><th>{{t "rides.col.bike"}}</th><th></th></tr></thead>
+      <tbody>
+        {{range $i, $g := .}}
+        {{$sel := $.DefaultBike}}{{with $g.Mapping}}{{$sel = .BikeID}}{{end}}
+        <tr>
+          <td>{{gearName $g.Key $g.Name}}<br><small>{{t (print "rides.source." $g.Source)}}{{if not $g.Mapping}} · {{t "rides.preview.new_gear"}}{{end}}</small>
+            <input type="hidden" name="gear.{{$i}}.source" value="{{$g.Source}}">
+            <input type="hidden" name="gear.{{$i}}.key" value="{{$g.Key}}">
+            <input type="hidden" name="gear.{{$i}}.name" value="{{$g.Name}}"></td>
+          <td data-label="{{t "rides.col.bike"}}"><select name="gear.{{$i}}.bike" aria-label="{{t "rides.col.bike"}}">
+            <option value="">{{t "rides.unassigned"}}</option>
+            {{range $.Bikes}}<option value="{{.ID}}"{{if eq .ID $sel}} selected{{end}}>{{.Name}}</option>{{end}}
+          </select></td>
+          <td><label><input type="checkbox" name="gear.{{$i}}.remember" value="1" checked> {{t "rides.preview.remember"}}</label></td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    </div>
+  </section>
+  {{end}}
+  <section>
+    <h2>{{t "rides.title"}}</h2>
+    <div class="overflow-auto">
+    <table class="import-rows">
+      <thead><tr><th>{{t "rides.col.ride"}}</th><th>{{t "rides.col.distance"}}</th><th>{{t "rides.col.bike"}}</th></tr></thead>
+      <tbody>
+        {{range $i, $row := .Rows}}
+        {{$status := $row.Status.String}}
+        <tr>
+          <td><input type="hidden" name="ride.{{$i}}" value="{{$row.Data}}">
+            {{if eq $status "known"}}{{date $row.RiddenOn}}{{else}}<label><input type="checkbox" name="import.{{$i}}" value="1" aria-label="{{t "rides.preview.import"}}"{{if and (eq $status "new") (not $row.Doubt)}} checked{{end}}> {{date $row.RiddenOn}}</label>{{end}}
+            {{if ne $status "new"}}<span class="badge open">{{t (print "rides.status." $status)}}</span>{{end}}
+            {{with $row.Doubt}}<span class="badge open">{{t (print "rides.doubt." .)}}</span>{{end}}<br><small>{{$row.Name}} · {{t (print "rides.source." $row.Source)}}</small></td>
+          <td data-label="{{t "rides.col.distance"}}">{{km $row.DistanceM}}</td>
+          <td data-label="{{t "rides.col.bike"}}">{{if eq $status "known"}}{{if $row.BikeName}}{{$row.BikeName}}{{else}}{{t "rides.unassigned"}}{{end}}{{else}}
+            <select name="bike.{{$i}}" aria-label="{{t "rides.col.bike"}}">
+              <option value="auto">{{if $row.GearKey}}{{t "rides.preview.auto_gear" (gearName $row.GearKey $row.GearName)}}{{else}}{{t "rides.preview.auto"}}{{end}}</option>
+              <option value="">{{t "rides.unassigned"}}</option>
+              {{range $.Bikes}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+            </select>{{end}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    </div>
+  </section>
+  {{if .New}}<button type="submit">{{t "rides.preview.submit"}}</button>{{else}}<p>{{t "rides.preview.nothing"}}</p>{{end}}
+</form>
+{{end}}

@@ -1,0 +1,9 @@
+{{define "title"}}{{t "error.page_title"}}{{end}}
+
+{{define "content"}}
+<article class="auth">
+  <h1>{{t "error.page_title"}}</h1>
+  <p>{{.Message}}</p>
+  <a href="/" role="button">{{t "error.back"}}</a>
+</article>
+{{end}}

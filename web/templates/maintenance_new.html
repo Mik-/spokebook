@@ -1,0 +1,38 @@
+{{define "title"}}{{t "maintenance.start"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.Bike.ID}}">{{.Bike.Name}}</a></li><li>{{t "maintenance.start"}}</li></ul></nav>
+<h1>{{t "maintenance.start"}}</h1>
+{{template "error" .}}
+{{if .HasSteps}}
+<form method="post" action="/bikes/{{.Bike.ID}}/maintenances">
+  <label>{{t "maintenance.field.level"}}
+    <select name="level">
+      <option value="">{{t "maintenance.level.none"}}</option>
+      {{range .Levels}}<option value="{{.Level}}"{{if eq .Level ($.Form.Get "level")}} selected{{end}}>{{t (print "level." .Level)}} ({{tn "steps.count" .Steps}})</option>{{end}}
+    </select>
+  </label>
+  {{with .Due}}
+  <fieldset>
+    <legend>{{t "maintenance.due_steps"}}</legend>
+    {{range .}}<label><input type="checkbox" name="step" value="{{.Step.ID}}"{{if has (index $.Form "step") .Step.ID}} checked{{end}}> {{.Step.Title}} {{template "due-badge" .}} <small>({{template "due-when" .}})</small></label>{{end}}
+  </fieldset>
+  {{end}}
+  {{with .OnDemand}}
+  <fieldset>
+    <legend>{{t "maintenance.on_demand"}}</legend>
+    {{range .}}<label><input type="checkbox" name="step" value="{{.ID}}"{{if has (index $.Form "step") .ID}} checked{{end}}> {{.Title}} <small>({{t (print "phase." .Phase)}}{{with .Assembly}} · {{t (print "assembly." .)}}{{end}})</small></label>{{end}}
+  </fieldset>
+  {{end}}
+  <div class="grid">
+    <label>{{t "maintenance.field.date"}}<span class="req" aria-hidden="true">*</span> <input type="date" name="date" value="{{.Form.Get "date"}}" required></label>
+    <label>{{t "component.field.odometer_km"}}<span class="req" aria-hidden="true">*</span> <input type="number" name="km" min="0" step="0.1" inputmode="decimal" value="{{.Form.Get "km"}}" required></label>
+  </div>
+  <small>{{t "maintenance.start.hint"}}</small>
+  <button type="submit">{{t "maintenance.start"}}</button>
+</form>
+{{else}}
+<p>{{t "maintenance.no_steps"}}</p>
+<a href="/steps/new" role="button">{{t "step.new"}}</a>
+{{end}}
+{{end}}

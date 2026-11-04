@@ -1,0 +1,165 @@
+{{define "title"}}{{.Bike.Name}}{{end}}
+
+{{define "content"}}
+{{$b := .Bike}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li>{{$b.Name}}</li></ul></nav>
+<div class="page-head">
+  <h1>{{$b.Name}}</h1>
+  <div class="actions"><a href="/bikes/{{$b.ID}}/edit" role="button" class="outline">{{t "action.edit"}}</a></div>
+</div>
+{{template "retired-banner" $b}}
+{{template "error" .}}
+{{with .Cover}}<a href="/attachments/{{.ID}}" class="bike-photo"><img src="/attachments/{{.ID}}" alt="{{$b.Name}}"></a>{{end}}
+<div class="stats">
+  <div><small>{{t "bike.odometer"}}</small><strong>{{with .Current}}{{km (deref .)}}{{else}}–{{end}}</strong></div>
+  <div><small>{{t "bike.components"}}</small><strong><a href="/bikes/{{$b.ID}}/components">{{.Installed}}</a></strong></div>
+  <div><small>{{t "bikes.last_maintenance"}}</small><strong>{{with .Maintenances}}{{with index . 0}}<a href="/maintenances/{{.ID}}">{{date .PerformedAt}}</a>{{end}}{{else}}–{{end}}</strong></div>
+  <div{{if .Alerts}} class="alert"{{end}}><small>{{t "bike.alerts"}}</small><strong>{{len .Alerts}}</strong></div>
+</div>
+
+{{with .Open}}
+<article class="open-maintenance">
+  <p><small>{{t "bike.open_maintenance"}}</small><br><a href="/maintenances/{{.ID}}">{{date .PerformedAt}} · {{template "maintenance-name" .}}</a><br>{{template "maintenance-status" .}}</p>
+  <a href="/maintenances/{{.ID}}" role="button">{{t "maintenance.continue"}}</a>
+</article>
+{{end}}
+
+<details class="bike-facts">
+  <summary>{{t "bike.facts"}}</summary>
+  <dl>
+    {{with $b.Type}}<dt>{{t "bikes.field.type"}}</dt><dd>{{.}}</dd>{{end}}
+    {{with $b.Origin}}<dt>{{t "bike.field.origin"}}</dt><dd>{{t (print "bike.origin." .)}}</dd>{{end}}
+    {{with $b.PurchasedAt}}<dt>{{t "component.field.purchased_at"}}</dt><dd>{{date .}}</dd>{{end}}
+    {{with $b.Dealer}}<dt>{{t "component.field.dealer"}}</dt><dd>{{.}}</dd>{{end}}
+    {{with $b.PriceCents}}<dt>{{t "component.field.price"}}</dt><dd>{{money . $b.Currency}}</dd>{{end}}
+    {{if or $b.InServiceAt $b.InServiceM}}<dt>{{t "bike.in_service"}}</dt><dd>{{with $b.InServiceAt}}{{date .}}{{end}}{{if and $b.InServiceAt $b.InServiceM}} · {{end}}{{with $b.InServiceM}}{{km .}}{{end}}</dd>{{end}}
+    {{with $b.Features}}<dt>{{t "bike.features"}}</dt><dd>{{range $i, $f := .}}{{if $i}}, {{end}}{{t (print "feature." $f)}}{{end}}</dd>{{end}}
+    {{with $b.Notes}}<dt>{{t "bikes.field.notes"}}</dt><dd>{{.}}</dd>{{end}}
+  </dl>
+</details>
+
+{{if .Due}}
+<section>
+  <div class="page-head">
+    <h2>{{t "due.title"}}</h2>
+    <div class="actions"><a href="/intervals" role="button" class="outline">{{t "intervals.title"}}</a></div>
+  </div>
+  <ul class="wear-list">
+    {{range .Due}}
+    {{$it := .}}
+    <li{{if eq .State.String "overdue"}} class="flagged"{{end}}><strong>{{template "due-name" .}}</strong> {{template "due-badge" .}} <small>{{template "interval" .Interval}}</small><br>
+      {{template "due-when" .}}{{if not .Open}} <small>({{if .Done}}{{t "due.last_done" (date .SinceAt)}}{{else}}{{t "due.since_service" (date .SinceAt)}}{{end}})</small>{{end}}{{template "due-bar" .}}
+      {{with .Open}}
+      <div class="row-action open-work">
+        {{if not $.Open}}<a href="/bikes/{{$b.ID}}/maintenances/new?step={{$it.Step.ID}}" role="button" class="outline">{{t "due.catch_up"}}</a>{{end}}
+        <form method="post" action="/maintenances/{{.MaintenanceID}}/steps/{{.Step.ID}}/dismiss"><input type="hidden" name="back" value="bike"><button type="submit" class="outline">{{t "due.dismiss"}}</button></form>
+      </div>
+      {{end}}
+    </li>
+    {{end}}
+  </ul>
+  {{if and .Pending (not .Open)}}<a href="/bikes/{{$b.ID}}/maintenances/new" role="button">{{t "maintenance.start"}}</a>{{end}}
+</section>
+{{end}}
+
+<section>
+  <div class="page-head">
+    <h2>{{t "bike.components"}}</h2>
+    <div class="actions"><a href="/bikes/{{$b.ID}}/components" role="button" class="outline">{{t "bike.components.show"}}</a></div>
+  </div>
+  {{if or .Alerts .Worn}}
+  <ul class="wear-list">
+    {{range .Alerts}}<li class="flagged"><a href="/components/{{.ID}}?bike={{$b.ID}}">{{template "component-name" .}}</a> <small>{{.TypeName}}</small><br>{{template "component-wear" .}}{{template "wear-bar" .}}</li>{{end}}
+    {{range .Worn}}<li><a href="/components/{{.ID}}?bike={{$b.ID}}">{{template "component-name" .}}</a> <small>{{.TypeName}}</small><br>{{template "component-wear" .}}{{template "wear-bar" .}}</li>{{end}}
+  </ul>
+  {{else}}
+  <p>{{if .Installed}}{{tn "bike.components.count" .Installed}}{{else}}{{t "bike.components.empty"}}{{end}}</p>
+  {{end}}
+</section>
+
+<section>
+  <div class="page-head">
+    <h2>{{t "bike.values"}}</h2>
+    <div class="actions"><a href="/bikes/{{$b.ID}}/values" role="button" class="outline">{{t "action.edit"}}</a></div>
+  </div>
+  {{if .Values}}
+  <div class="overflow-auto">
+  <table>
+    <thead><tr><th>{{t "value.field.label"}}</th><th>{{t "value.field.value"}}</th></tr></thead>
+    <tbody>
+      {{range .Values}}<tr><td>{{.Label}}{{with .Hint}}<br><small>{{.}}</small>{{end}}</td><td data-label="{{t "value.field.value"}}">{{value .}}</td></tr>{{end}}
+    </tbody>
+  </table>
+  </div>
+  {{else}}
+  <p>{{t "bike.values.empty"}}</p>
+  {{end}}
+</section>
+
+<section>
+  <div class="page-head">
+    <h2>{{t "maintenances.title"}}</h2>
+    {{if $b.Active}}<a href="/bikes/{{$b.ID}}/maintenances/new" role="button" title="{{t "maintenance.start"}}">+ {{t "action.new"}}</a>{{end}}
+  </div>
+  {{if .Maintenances}}
+  <div class="overflow-auto">
+  <table>
+    <thead>
+      <tr><th>{{t "maintenance.field.date"}}</th><th>{{t "maintenance.field.level"}}</th><th>{{t "bike.odometer"}}</th><th>{{t "maintenance.status"}}</th></tr>
+    </thead>
+    <tbody>
+      {{range .Maintenances}}
+      <tr>
+        <td><a href="/maintenances/{{.ID}}">{{date .PerformedAt}}</a></td>
+        <td data-label="{{t "maintenance.field.level"}}">{{template "maintenance-name" .}}</td>
+        <td data-label="{{t "bike.odometer"}}">{{km .DistanceM}}</td>
+        <td data-label="{{t "maintenance.status"}}">{{template "maintenance-status" .}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+  {{else}}
+  <p>{{t "maintenances.empty"}}</p>
+  {{end}}
+</section>
+
+<section>
+  <div class="page-head">
+    <h2>{{t "bike.odometer"}}</h2>
+    {{if $b.Active}}<a href="/bikes/{{$b.ID}}/odometer/new" role="button" title="{{t "bike.odometer.new"}}">+ {{t "action.new"}}</a>{{end}}
+  </div>
+  {{if .RideCount}}<p><small>{{tn "bike.rides" .RideCount}} · {{km .RidesM}} · <a href="/rides?bike={{$b.ID}}&amp;year=all">{{t "bike.rides.show"}}</a></small></p>{{end}}
+  {{if .Readings}}
+  <div class="overflow-auto">
+  <table>
+    <thead>
+      <tr><th>{{t "bike.odometer.field.date"}}</th><th>{{t "bike.odometer"}}</th><th>{{t "bike.odometer.source"}}</th><th></th></tr>
+    </thead>
+    <tbody>
+      {{range .Readings}}
+      <tr>
+        <td>{{date .RecordedAt}}</td>
+        <td data-label="{{t "bike.odometer"}}">{{km .DistanceM}}</td>
+        <td data-label="{{t "bike.odometer.source"}}">{{t (print "bike.odometer.source." .Source)}}</td>
+        <td class="row-action"><a href="/bikes/{{.BikeID}}/odometer/{{.ID}}/edit" role="button" class="outline">{{t "action.edit"}}</a></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+  {{else}}
+  <p>{{t "bike.odometer.empty"}}</p>
+  {{end}}
+</section>
+
+{{template "attachments" (dict "Target" .Target "Items" .Attachments)}}
+
+<div class="actions end">
+{{if $b.Active}}
+  <a href="/bikes/{{$b.ID}}/retire" role="button" class="outline danger">{{t "retire.bike"}}</a>
+{{else}}
+  <form method="post" action="/bikes/{{$b.ID}}/reactivate"><button type="submit" class="outline">{{t "retire.reactivate"}}</button></form>
+{{end}}
+</div>
+{{end}}

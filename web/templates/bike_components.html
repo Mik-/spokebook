@@ -1,0 +1,56 @@
+{{define "title"}}{{t "bike.components"}}: {{.Bike.Name}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.Bike.ID}}">{{.Bike.Name}}</a></li><li>{{t "bike.components"}}</li></ul></nav>
+<div class="page-head">
+  <h1>{{t "bike.components"}}</h1>
+  {{if .Bike.Active}}<div class="actions">
+    <a href="/bikes/{{.Bike.ID}}/components/install" role="button" class="outline">{{t "bike.components.install_spare"}}</a>
+    <a href="/bikes/{{.Bike.ID}}/components/new" role="button" title="{{t "bike.components.add"}}">+ {{t "action.new"}}</a>
+  </div>{{end}}
+</div>
+{{if .Installed}}
+<div class="overflow-auto">
+<table>
+  <thead>
+    <tr><th>{{t "components.col.component"}}</th><th>{{t "bike.components.since"}}</th><th>{{t "components.col.mileage"}}</th><th></th></tr>
+  </thead>
+  <tbody>
+    {{range .Installed}}
+    <tr{{if .Wear.Alert}} class="flagged"{{end}}>
+      <td><a href="/components/{{.ID}}?bike={{$.Bike.ID}}">{{template "component-name" .}}</a><br><small>{{.TypeName}}{{with .Current.Position}} · {{t (print "position." .)}}{{end}}</small></td>
+      <td data-label="{{t "bike.components.since"}}">{{date .Current.InstalledAt}}<br><small>{{km .Current.InstalledM}}</small></td>
+      <td data-label="{{t "components.col.mileage"}}">{{template "component-wear" .}}{{template "wear-bar" .}}</td>
+      <td class="row-action"><a href="/components/{{.ID}}/replace" role="button" class="outline">{{t "component.replace"}}</a></td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+</div>
+{{else}}
+<p>{{t "bike.components.empty"}}</p>
+{{end}}
+
+{{with .Past}}
+<details>
+  <summary>{{t "bike.components.past" (len .)}}</summary>
+  <div class="overflow-auto">
+  <table>
+    <thead>
+      <tr><th>{{t "components.col.component"}}</th><th>{{t "component.history.from"}}</th><th>{{t "component.history.to"}}</th><th>{{t "component.history.distance"}}</th></tr>
+    </thead>
+    <tbody>
+      {{range .}}{{$c := .C}}
+      <tr>
+        <td><a href="/components/{{$c.ID}}?bike={{$.Bike.ID}}">{{template "component-name" $c}}</a><br><small>{{$c.TypeName}}{{with .Position}} · {{t (print "position." .)}}{{end}}{{with $c.RetiredAt}} · {{t "bike.components.retired" (date .) (t (print "retire.reason." $c.RetireReason))}}{{end}}</small></td>
+        <td data-label="{{t "component.history.from"}}">{{date .InstalledAt}}<br><small>{{km .InstalledM}}</small></td>
+        <td data-label="{{t "component.history.to"}}">{{date .RemovedAt}}{{with .RemovedM}}<br><small>{{km .}}</small>{{end}}</td>
+        <td data-label="{{t "component.history.distance"}}">{{km .DistanceM}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+</details>
+{{end}}
+{{end}}

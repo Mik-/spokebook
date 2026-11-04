@@ -1,0 +1,15 @@
+{{define "title"}}{{t "attachments.new"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul>{{range .Target.Crumbs}}<li><a href="{{.Path}}">{{.Name}}</a></li>{{end}}<li>{{t "attachments.new"}}</li></ul></nav>
+<h1>{{t "attachments.new"}}</h1>
+{{template "error" .}}
+{{template "file-errors" .FileErrors}}
+<form method="post" action="{{.Target.Path}}/attachments" enctype="multipart/form-data">
+  <label>{{t "attachments.field.files"}}<span class="req" aria-hidden="true">*</span>
+    <input type="file" name="files" accept="image/jpeg,image/png,image/webp,image/gif,application/pdf" multiple required>
+    <small>{{t "attachments.files_hint" .MaxMB}}</small>
+  </label>
+  <button type="submit">{{t "attachments.upload"}}</button>
+</form>
+{{end}}

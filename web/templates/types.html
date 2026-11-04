@@ -1,0 +1,56 @@
+{{define "title"}}{{t "types.title"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/components">{{t "components.title"}}</a></li><li>{{t "types.title"}}</li></ul></nav>
+<div class="page-head">
+  <h1>{{t "types.title"}}</h1>
+  <a href="/component-types/new" role="button" title="{{t "types.new"}}">+ {{t "action.new"}}</a>
+</div>
+{{template "error" .}}
+<div class="overflow-auto">
+<table>
+  <tbody>
+    {{range .Types}}
+    <tr>
+      <td>
+        <form method="post" action="/component-types/{{.ID}}">
+          <fieldset role="group">
+            <input name="name" value="{{.Custom}}" aria-label="{{t "types.field.name"}}"
+                   placeholder="{{.Name}}"{{if not .Builtin}} required{{end}}>
+            <button type="submit" class="outline">{{t "types.rename"}}</button>
+          </fieldset>
+        </form>
+      </td>
+      <td class="row-action"><a href="/component-types/{{.ID}}/values" role="button" class="outline">{{t "types.values"}}</a></td>
+      <td class="row-action">
+        <form method="post" action="/component-types/{{.ID}}/delete">
+          <button type="submit" class="outline danger">{{t "types.delete"}}</button>
+        </form>
+      </td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+</div>
+<p><small>{{t "types.hint"}}</small></p>
+
+{{with .Hidden}}
+<details>
+  <summary>{{t "types.hidden" (len .)}}</summary>
+  <p><small>{{t "types.hidden.hint"}}</small></p>
+  <div class="overflow-auto">
+  <table>
+    <thead><tr><th>{{t "types.field.name"}}</th><th></th></tr></thead>
+    <tbody>
+      {{range .}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td class="row-action"><form method="post" action="/component-types/{{.ID}}/restore"><button type="submit" class="outline">{{t "types.restore"}}</button></form></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+</details>
+{{end}}
+{{end}}

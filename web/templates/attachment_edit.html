@@ -1,0 +1,46 @@
+{{define "title"}}{{.A.Name}}{{end}}
+
+{{define "content"}}
+{{$a := .A}}
+<nav aria-label="breadcrumb"><ul>{{range .Target.Crumbs}}<li><a href="{{.Path}}">{{.Name}}</a></li>{{end}}<li>{{$a.Name}}</li></ul></nav>
+<div class="page-head">
+  <h1>{{$a.Name}}</h1>
+  <div class="actions">
+    {{if $a.HasThumb}}<a href="/attachments/{{$a.ID}}" role="button" class="outline">{{t "attachments.open"}}</a>
+    {{else}}<a href="/attachments/{{$a.ID}}" role="button" class="outline" target="_blank" rel="noopener">{{t "attachments.open"}}</a>
+    <a href="/attachments/{{$a.ID}}?download" role="button" class="outline">{{t "attachments.download"}}</a>{{end}}
+  </div>
+</div>
+{{template "error" .}}
+{{if $a.HasThumb}}<p><a href="/attachments/{{$a.ID}}"><img class="attachment-large" src="/attachments/{{$a.ID}}/thumb" alt="{{$a.Name}}"></a></p>{{end}}
+<p><small>{{t "attachments.uploaded" (date $a.CreatedAt)}}</small></p>
+<form method="post" action="/attachments/{{$a.ID}}{{.Target.Query}}">
+  <label>{{t "attachments.field.name"}}<span class="req" aria-hidden="true">*</span>
+    <input name="name" value="{{.Form.Get "name"}}" maxlength="200" required>
+  </label>
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+
+<section>
+  <h2>{{t "attachments.links"}}</h2>
+  <div class="overflow-auto">
+  <table>
+    <thead><tr><th>{{t "attachments.links.name"}}</th><th>{{t "attachments.links.kind"}}</th><th></th></tr></thead>
+    <tbody>
+      {{range .Links}}
+      <tr>
+        <td><a href="{{.Path}}">{{.Name}}</a>{{if .Cover}} <span class="badge done">{{t "attachments.cover"}}</span>{{end}}</td>
+        <td data-label="{{t "attachments.links.kind"}}">{{if .BikeID}}{{t "attachments.links.bike"}}{{else}}{{t "attachments.links.component"}}{{end}}</td>
+        <td class="row-action">{{if gt (len $.Links) 1}}<form method="post" action="/attachments/{{$a.ID}}/unlink{{$.Target.Query}}">{{if .BikeID}}<input type="hidden" name="unlink_bike" value="{{.BikeID}}">{{else}}<input type="hidden" name="unlink_component" value="{{.ComponentID}}">{{end}}<button type="submit" class="outline">{{t "attachments.unlink"}}</button></form>{{end}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+  <p><small>{{t "attachments.links.hint"}}</small></p>
+</section>
+
+<div class="actions end">
+  <a href="/attachments/{{$a.ID}}/delete{{.Target.Query}}" role="button" class="outline danger">{{t "action.delete"}}</a>
+</div>
+{{end}}

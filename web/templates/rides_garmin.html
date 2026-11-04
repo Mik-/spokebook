@@ -1,0 +1,65 @@
+{{define "title"}}{{t "garmin.title"}}{{end}}
+
+{{define "scripts"}}{{template "htmx"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/rides">{{t "rides.title"}}</a></li><li>{{t "garmin.title"}}</li></ul></nav>
+<div class="page-head">
+  <h1>{{t "garmin.title"}}</h1>
+  {{if and .Enabled .Source}}
+  <div class="actions">
+    <a href="/rides/garmin/connect" role="button" class="outline">{{t "garmin.settings"}}</a>
+    <form method="post" action="/rides/garmin/sync"><button type="submit">{{t "garmin.sync"}}</button></form>
+  </div>
+  {{end}}
+</div>
+{{if not .Enabled}}
+<p role="alert">{{t "garmin.disabled"}}</p>
+{{else if not .Source}}
+<p>{{t "garmin.intro"}}</p>
+<p><a href="/rides/garmin/connect" role="button">{{t "garmin.connect"}}</a></p>
+{{else}}
+{{if .TooSoon}}<p role="status">{{t "garmin.too_soon"}}</p>{{end}}
+{{with .Source}}
+{{if $.Pending}}
+<div id="garmin-status" hx-get="/rides/garmin" hx-select="#garmin-status" hx-trigger="every 3s" hx-swap="outerHTML">
+  <p role="status" aria-busy="true">{{t "garmin.pending"}}</p>
+  {{with $.Progress}}
+  <p>{{tn "garmin.progress.checked" .Checked}} {{tn "rides.result.imported" .Imported}}{{if .Unassigned}} {{tn "rides.result.unassigned" .Unassigned}}{{end}}</p>
+  {{end}}
+  {{if $.Fetched}}
+  <div class="overflow-auto">
+  <table>
+    <thead>
+      <tr><th>{{t "rides.col.ride"}}</th><th>{{t "rides.col.bike"}}</th><th>{{t "rides.col.distance"}}</th></tr>
+    </thead>
+    <tbody>
+      {{range $.Fetched}}
+      <tr>
+        <td><a href="/rides/{{.ID}}/edit">{{date .RiddenOn}}</a><br><small>{{.Name}}</small></td>
+        <td data-label="{{t "rides.col.bike"}}">{{if .BikeID}}{{.BikeName}}{{else}}<span class="badge open">{{t "rides.unassigned"}}</span>{{end}}</td>
+        <td data-label="{{t "rides.col.distance"}}">{{km .DistanceM}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+  {{if gt $.Progress.Imported (len $.Fetched)}}<p><small>{{t "garmin.progress.newest" (len $.Fetched)}}</small></p>{{end}}
+  {{end}}
+</div>
+{{else}}
+<div id="garmin-status">
+  {{if .LastError}}<p role="alert">{{t (print "garmin.run_error." .LastError)}}</p>{{end}}
+  {{if $.LastRun}}
+  <p>{{t "garmin.last_run" $.LastRun}} {{tn "rides.result.imported" .LastImported}}{{if .LastUnassigned}} {{tn "rides.result.unassigned" .LastUnassigned}} <a href="/ride-gears">{{t "garmin.map_gears"}}</a>{{end}}</p>
+  {{with $.Until}}<p>{{t "garmin.until" .}}{{if and $.Source.More (not $.Source.LastError)}} {{t "garmin.more"}}{{end}}</p>{{end}}
+  {{else}}
+  <p>{{t "garmin.never"}}</p>
+  {{end}}
+</div>
+{{end}}
+<p><small>{{t "garmin.since" (date .Since)}} {{t "garmin.schedule"}}</small></p>
+{{end}}
+<div class="actions end"><a href="/rides/garmin/disconnect" role="button" class="outline danger">{{t "garmin.disconnect"}}</a></div>
+{{end}}
+{{end}}

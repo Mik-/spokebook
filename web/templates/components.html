@@ -1,0 +1,72 @@
+{{define "title"}}{{t "components.title"}}{{end}}
+
+{{define "scripts"}}{{template "htmx"}}{{end}}
+
+{{define "content"}}
+<div class="page-head">
+  <h1>{{t "components.title"}}</h1>
+  <div class="actions">
+    <a href="/component-types" role="button" class="outline">{{t "types.manage"}}</a>
+    <a href="/components/new" role="button" title="{{t "components.new"}}">+ {{t "action.new"}}</a>
+  </div>
+</div>
+{{if or .Bikes .Types}}
+{{/* With htmx, a change only replaces the list and keeps the URL. */}}
+<form method="get" action="/components" class="filter" hx-get="/components" hx-trigger="change, submit"
+      hx-target="#component-list" hx-select="#component-list" hx-swap="outerHTML" hx-push-url="true">
+  <select name="bike" aria-label="{{t "components.col.bike"}}">
+    <option value="">{{t "components.filter.all_bikes"}}</option>
+    {{range .Bikes}}<option value="{{.Value}}"{{if eq .Value $.Bike}} selected{{end}}>{{.Label}}</option>{{end}}
+    <option value="none"{{if eq "none" .Bike}} selected{{end}}>{{t "components.filter.not_installed"}}</option>
+  </select>
+  <select name="type" aria-label="{{t "component.field.type"}}">
+    <option value="">{{t "components.filter.all_types"}}</option>
+    {{range .Types}}<option value="{{.Value}}"{{if eq .Value $.Type}} selected{{end}}>{{.Label}}</option>{{end}}
+  </select>
+  <button type="submit" class="outline">{{t "components.filter.apply"}}</button>
+</form>
+{{end}}
+<div id="component-list">
+{{if and .Filtered .Components}}<p><small>{{tn "components.filter.count" (len .Components)}} · <a href="/components">{{t "components.filter.reset"}}</a></small></p>{{end}}
+{{if .Components}}
+<div class="overflow-auto">
+<table>
+  <thead>
+    <tr><th>{{t "components.col.component"}}</th><th>{{t "components.col.bike"}}</th><th>{{t "components.col.mileage"}}</th></tr>
+  </thead>
+  <tbody>
+    {{range .Components}}
+    <tr{{if .Wear.Alert}} class="flagged"{{end}}>
+      <td><a href="/components/{{.ID}}">{{template "component-name" .}}</a><br><small>{{.TypeName}}</small></td>
+      <td data-label="{{t "components.col.bike"}}">{{if .Current}}<a href="/bikes/{{.Current.BikeID}}">{{.BikeName}}</a>{{with .Current.Position}}<br><small>{{t (print "position." .)}}</small>{{end}}{{else}}–{{end}}</td>
+      <td data-label="{{t "components.col.mileage"}}">{{template "component-wear" .}}{{template "wear-bar" .}}</td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+</div>
+{{else if .Filtered}}
+<p>{{t "components.filter.empty"}} <a href="/components">{{t "components.filter.reset"}}</a></p>
+{{else}}
+<p>{{t "components.empty"}}</p>
+{{end}}
+{{with .Retired}}
+<details>
+  <summary>{{t "retire.list" (len .)}}</summary>
+  <div class="overflow-auto">
+  <table>
+    <tbody>
+      {{range .}}
+      <tr>
+        <td><a href="/components/{{.ID}}">{{template "component-name" .}}</a><br><small>{{.TypeName}}</small></td>
+        <td>{{date .RetiredAt}}<br><small>{{t (print "retire.reason." .RetireReason)}}</small></td>
+        <td>{{km .Wear.MileageM}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+</details>
+{{end}}
+</div>
+{{end}}

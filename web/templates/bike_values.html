@@ -1,0 +1,11 @@
+{{define "title"}}{{t "bike.values.edit"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.Bike.ID}}">{{.Bike.Name}}</a></li><li>{{t "bike.values"}}</li></ul></nav>
+<h1>{{t "bike.values.edit"}}</h1>
+{{template "error" .}}
+<form method="post" action="/bikes/{{.Bike.ID}}/values">
+  {{template "value-fields" .}}
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+{{end}}

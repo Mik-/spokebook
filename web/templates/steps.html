@@ -1,0 +1,114 @@
+{{define "title"}}{{t "steps.title"}}{{end}}
+
+{{define "scripts"}}{{template "htmx"}}{{end}}
+
+{{define "content"}}
+<div class="page-head">
+  <h1>{{t "steps.title"}}</h1>
+  <div class="actions">
+    <a href="/steps/modules" role="button" class="outline">{{t "modules.title"}}</a>
+    <a href="/intervals" role="button" class="outline">{{t "intervals.title"}}</a>
+    <a href="/steps/new" role="button" title="{{t "step.new"}}">+ {{t "action.new"}}</a>
+  </div>
+</div>
+<details class="filter"{{if .Filtered}} open{{end}}>
+  <summary>{{t "steps.filter"}}</summary>
+  <form method="get" action="/steps">
+    <div class="grid">
+      <label>{{t "step.field.levels"}}
+        <select name="level">
+          <option value="">{{t "steps.filter.all"}}</option>
+          {{range .Levels}}<option value="{{.}}"{{if eq . $.Filter.Level}} selected{{end}}>{{t (print "level." .)}}</option>{{end}}
+          <option value="{{.OnDemand}}"{{if eq .OnDemand .Filter.Level}} selected{{end}}>{{t "level.on_demand"}}</option>
+        </select>
+      </label>
+      <label>{{t "step.field.module"}}
+        <select name="module">
+          <option value="">{{t "steps.filter.all"}}</option>
+          <option value="{{.NoModule}}"{{if eq .NoModule .Filter.Module}} selected{{end}}>{{t "steps.filter.no_module"}}</option>
+          {{range .Modules}}<option value="{{.}}"{{if eq . $.Filter.Module}} selected{{end}}>{{t (print "feature." .)}}</option>{{end}}
+        </select>
+      </label>
+      <label>{{t "step.field.assembly"}}
+        <select name="assembly">
+          <option value="">{{t "steps.filter.all"}}</option>
+          {{range .Assemblies}}<option value="{{.}}"{{if eq . $.Filter.Assembly}} selected{{end}}>{{t (print "assembly." .)}}</option>{{end}}
+        </select>
+      </label>
+      <label>{{t "step.field.action"}}
+        <select name="action">
+          <option value="">{{t "steps.filter.all"}}</option>
+          {{range .Actions}}<option value="{{.}}"{{if eq . $.Filter.Action}} selected{{end}}>{{t (print "step.action." .)}}</option>{{end}}
+        </select>
+      </label>
+    </div>
+    <label>{{t "steps.filter.search"}} <input type="search" name="q" value="{{.Filter.Query}}"></label>
+    <div class="actions">
+      <button type="submit">{{t "steps.filter.apply"}}</button>
+      {{if .Filtered}}<a href="/steps" role="button" class="outline">{{t "steps.filter.reset"}}</a>{{end}}
+    </div>
+  </form>
+</details>
+{{range $p := .Phases}}
+<details class="phase"{{if $p.Open}} open{{end}}>
+  <summary><h2>{{t (print "phase." $p.Phase)}}</h2> <small>{{tn "steps.count" $p.Count}}{{range $p.LevelCounts}} · {{t (print "level." .Level ".short")}} {{.N}}{{end}}</small></summary>
+  <div class="overflow-auto">
+  <table class="catalog">
+    <thead><tr><th>{{t "step.field.title"}}</th><th>{{t "step.field.action"}}</th><th>{{t "step.field.levels"}}</th><th>{{t "steps.col.interval"}}</th><th></th></tr></thead>
+    {{range .Groups}}
+    {{/* With htmx, moving a step only replaces its group (the page after the
+       redirect is fetched and the group selected), so the page doesn't jump. */}}
+    <tbody id="group-{{$p.Phase}}-{{.Assembly}}" hx-target="this" hx-select="#group-{{$p.Phase}}-{{.Assembly}}" hx-swap="outerHTML">
+      {{with .Assembly}}<tr class="assembly"><th scope="rowgroup" colspan="5">{{t (print "assembly." .)}}</th></tr>{{end}}
+      {{range $s := .Steps}}
+      <tr id="step-{{$s.ID}}">
+        <td>
+          <a href="/steps/{{$s.ID}}">{{$s.Title}}</a>
+          {{with $s.Module}}<span class="badge module">{{t (print "feature." .)}}</span>{{end}}
+          {{if or $s.Values $s.TypeNames}}<span class="badge" title="{{t "value.title"}}">{{t "value.title"}}</span>{{end}}
+          {{with $s.ReplacesTitle}}<br><small>{{t "step.replaces" .}}</small>{{end}}
+          {{with $s.DroppedBy}}<br><small>{{t "step.dropped_by" .}}</small>{{end}}
+          {{with $s.FindingTitles}}<br><small>{{t "step.leads_to" .}}</small>{{end}}
+          {{with $s.AlwaysTitles}}<br><small>{{t "step.then_always" .}}</small>{{end}}
+        </td>
+        <td data-label="{{t "step.field.action"}}">{{with $s.Action}}{{t (print "step.action." .)}}{{else}}–{{end}}</td>
+        <td data-label="{{t "step.field.levels"}}">{{template "level-ladder" $s.Levels}}</td>
+        <td data-label="{{t "steps.col.interval"}}">{{if $s.Interval.IsZero}}–{{else}}{{template "interval" $s.Interval}}{{end}}</td>
+        <td class="row-action">
+          {{if not $.Filtered}}
+          {{if not $s.First}}<form method="post" action="/steps/{{$s.ID}}/up" hx-post="/steps/{{$s.ID}}/up"><button type="submit" class="outline" title="{{t "step.up"}}" aria-label="{{t "step.up"}}">↑</button></form>{{end}}
+          {{if not $s.Last}}<form method="post" action="/steps/{{$s.ID}}/down" hx-post="/steps/{{$s.ID}}/down"><button type="submit" class="outline" title="{{t "step.down"}}" aria-label="{{t "step.down"}}">↓</button></form>{{end}}
+          {{end}}
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+    {{end}}
+  </table>
+  </div>
+</details>
+{{else}}
+<p>{{if .Filtered}}{{t "steps.filter.empty"}}{{else}}{{t "steps.empty"}}{{end}}</p>
+{{end}}
+
+{{with .Hidden}}
+<details>
+  <summary>{{t "steps.hidden" (len .)}}</summary>
+  <p><small>{{t "steps.hidden.hint"}}</small></p>
+  <div class="overflow-auto">
+  <table>
+    <thead><tr><th>{{t "step.field.title"}}</th><th>{{t "step.field.phase"}}</th><th></th></tr></thead>
+    <tbody>
+      {{range .}}
+      <tr>
+        <td>{{.Title}}</td>
+        <td data-label="{{t "step.field.phase"}}">{{t (print "phase." .Phase)}}{{with .Assembly}}<br><small>{{t (print "assembly." .)}}</small>{{end}}</td>
+        <td class="row-action"><form method="post" action="/steps/{{.ID}}/restore"><button type="submit" class="outline">{{t "steps.restore"}}</button></form></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+</details>
+{{end}}
+{{end}}

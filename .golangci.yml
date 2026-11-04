@@ -1,0 +1,24 @@
+version: "2"
+
+linters:
+  enable:
+    - gosec
+  exclusions:
+    rules:
+      # Tests build fixtures by hand and use fake credentials.
+      - path: _test\.go
+        linters: [gosec]
+      # Every multipart upload is capped with http.MaxBytesReader first.
+      - linters: [gosec]
+        text: G120
+      # Session cookies are Secure whenever APP_BASE_URL is https.
+      - linters: [gosec]
+        text: G124
+      # Redirects go to paths on this site; the only free target, the login's
+      # "next", passes safeNext (see TestLoginRedirectsOnlyLocally).
+      - linters: [gosec]
+        text: G710
+
+formatters:
+  enable:
+    - gofumpt

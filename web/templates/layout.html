@@ -1,0 +1,56 @@
+{{define "layout"}}<!doctype html>
+<html lang="{{lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{block "title" .}}{{end}} · {{t "app.name"}}</title>
+  <link rel="stylesheet" href="/static/vendor/pico-2.1.1.min.css">
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <meta name="theme-color" content="#f4f7f5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#181d25" media="(prefers-color-scheme: dark)">
+  <script src="/static/pwa.js" defer></script>
+  {{block "scripts" .}}{{end}}
+</head>
+<body>
+  <header>
+    <nav class="container">
+      <ul><li><a href="/" class="brand">{{template "logo"}} {{t "app.name"}}</a></li></ul>
+      {{if .User}}
+      <ul class="sections">
+        <li><a href="/"{{if eq .Section "bikes"}} aria-current="page"{{end}}>{{template "icon-bike"}}<span class="label">{{t "nav.bikes"}}</span></a></li>
+        <li><a href="/components"{{if eq .Section "components"}} aria-current="page"{{end}}>{{template "icon-cog"}}<span class="label">{{t "nav.components"}}</span></a></li>
+        <li><a href="/shopping"{{if eq .Section "shopping"}} aria-current="page"{{end}}>{{template "icon-shopping-cart"}}<span class="label">{{t "nav.shopping"}}</span></a></li>
+        <li>
+          <details class="dropdown">
+            <summary{{if or (eq .Section "rides") (eq .Section "steps")}} class="current"{{end}}>{{template "icon-ellipsis"}}<span class="label">{{t "nav.more"}}</span></summary>
+            <ul dir="rtl">
+              <li><a href="/rides"{{if eq .Section "rides"}} aria-current="page"{{end}} dir="ltr">{{template "icon-route"}}{{t "nav.rides"}}</a></li>
+              <li><a href="/steps"{{if eq .Section "steps"}} aria-current="page"{{end}} dir="ltr">{{template "icon-list-checks"}}{{t "nav.steps"}}</a></li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <details class="dropdown">
+            <summary{{if eq .Section "account"}} class="current"{{end}}>{{template "icon-user"}}<span class="label">{{.User.Name}}</span></summary>
+            <ul dir="rtl">
+              <li><a href="/account"{{if eq .Section "account"}} aria-current="page"{{end}} dir="ltr">{{template "icon-user"}}{{t "nav.account"}}</a></li>
+              <li><form method="post" action="/logout" class="logout" dir="ltr"><button type="submit">{{template "icon-log-out"}}{{t "nav.logout"}}</button></form></li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+      {{end}}
+    </nav>
+  </header>
+  <main class="container">
+    {{block "content" .}}{{end}}
+  </main>
+  <footer class="container"><small>{{t "app.name"}}{{with .Version}} {{.}}{{end}}{{with .SourceURL}} · <a href="{{.}}">{{t "app.source"}}</a>{{end}}</small></footer>
+</body>
+</html>
+{{end}}

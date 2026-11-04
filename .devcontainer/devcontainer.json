@@ -1,0 +1,62 @@
+{
+  "name": "spokebook (Go + SQLite)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  // Go module and build caches survive a container rebuild
+  "mounts": [
+    "source=bike-gomodcache,target=/go/pkg/mod,type=volume",
+    "source=bike-gocache,target=/home/vscode/.cache/go-build,type=volume",
+    // Claude Code login and settings survive a rebuild
+    "source=bike-claude-config,target=/home/vscode/.claude,type=volume"
+  ],
+
+  "containerEnv": {
+    "CGO_ENABLED": "1",
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
+    "APP_ADDR": "localhost:8080",
+    "APP_DB_PATH": "${containerWorkspaceFolder}/data/dev.sqlite"
+  },
+
+  // WebAuthn/passkeys work on http://localhost without TLS,
+  // so always open the app via localhost:8080 (not 127.0.0.1).
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": { "label": "App", "onAutoForward": "notify" }
+  },
+
+  "postCreateCommand": "sudo chown -R vscode /go/pkg/mod /home/vscode/.cache /home/vscode/.claude && mkdir -p data && if [ -f go.mod ]; then go mod download; fi",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "golang.go",
+        "otovo-oss.htmx-tags",
+        "qwtel.sqlite-viewer",
+        "editorconfig.editorconfig",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "go.toolsManagement.autoUpdate": true,
+        "go.useLanguageServer": true,
+        "go.lintTool": "golangci-lint",
+        "go.lintFlags": ["--fast"],
+        "gopls": {
+          "formatting.gofumpt": true,
+          "ui.semanticTokens": true
+        },
+        "[go]": {
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": { "source.organizeImports": "explicit" }
+        },
+        "files.associations": { "*.gohtml": "html", "*.tmpl": "html" },
+        "files.exclude": { "data/*.sqlite*": true }
+      }
+    }
+  },
+
+  "remoteUser": "vscode"
+}

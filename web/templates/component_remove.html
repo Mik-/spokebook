@@ -1,0 +1,18 @@
+{{define "title"}}{{t "component.remove"}}{{end}}
+
+{{define "content"}}
+{{$c := .C}}
+<nav aria-label="breadcrumb"><ul><li><a href="/components">{{t "components.title"}}</a></li><li><a href="/components/{{$c.ID}}">{{template "component-name" $c}}</a></li><li>{{t "component.remove"}}</li></ul></nav>
+<h1>{{t "component.remove"}}: {{template "component-name" $c}}</h1>
+{{with $c.Current}}<p>{{t "component.installed_on" $c.BikeName (date .InstalledAt) (km .InstalledM)}}{{with .Position}} ({{t (print "position." .)}}){{end}}</p>{{end}}
+{{template "error" .}}
+<form method="post" action="/components/{{$c.ID}}/remove">
+  <input type="hidden" name="installation" value="{{$c.Current.ID}}">
+  <div class="grid">
+    <label>{{t "component.field.removed_at"}}<span class="req" aria-hidden="true">*</span> <input type="date" name="date" value="{{or (.Form.Get "date") .Today}}" required></label>
+    <label>{{t "component.field.odometer_km"}} <input type="number" name="km" min="0" step="0.1" inputmode="decimal" value="{{.Form.Get "km"}}"></label>
+  </div>
+  <small>{{t "component.odometer_hint"}}</small>
+  <button type="submit">{{t "component.remove"}}</button>
+</form>
+{{end}}

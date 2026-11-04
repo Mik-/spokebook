@@ -1,0 +1,19 @@
+{{define "title"}}{{t "shopping.new"}}{{end}}
+
+{{define "content"}}
+{{$o := .Origin}}
+<nav aria-label="breadcrumb"><ul>
+  {{if eq $o.Kind "maintenance"}}<li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{$o.Bike.ID}}">{{$o.Bike.Name}}</a></li><li><a href="{{$o.URL}}">{{$o.Name}}</a></li>
+  {{else if eq $o.Kind "component"}}<li><a href="/components">{{t "components.title"}}</a></li><li><a href="{{$o.URL}}">{{$o.Name}}</a></li>
+  {{else}}<li><a href="/shopping">{{t "shopping.title"}}</a></li>{{end}}
+  <li>{{t "shopping.new"}}</li>
+</ul></nav>
+<h1>{{t "shopping.new"}}</h1>
+{{template "error" .}}
+<form method="post" action="/shopping">
+  {{with $o.Kind}}<input type="hidden" name="{{.}}" value="{{$o.ID}}">{{end}}
+  <label>{{t "shopping.field.text"}}<span class="req" aria-hidden="true">*</span> <input name="text" value="{{.Form.Get "text"}}" required autofocus>
+  </label>
+  <button type="submit">{{t "shopping.add"}}</button>
+</form>
+{{end}}

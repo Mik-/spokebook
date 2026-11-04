@@ -1,0 +1,106 @@
+{{define "title"}}{{template "maintenance-name" .M}}{{end}}
+
+{{define "scripts"}}{{if .M.Open}}{{template "htmx"}}<script src="/static/wakelock.js" defer></script><script src="/static/autosave.js" defer></script>{{end}}{{end}}
+
+{{define "content"}}
+{{$m := .M}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.Bike.ID}}">{{.Bike.Name}}</a></li><li>{{t "maintenance.title"}}</li></ul></nav>
+<div class="page-head">
+  <h1>{{template "maintenance-name" $m}}</h1>
+  {{if $m.Open}}<div class="actions"><a href="/maintenances/{{$m.ID}}/steps" role="button">+ {{t "maintenance.add_steps"}}</a> <a href="/maintenances/{{$m.ID}}/edit" role="button" class="outline">{{t "maintenance.edit_date"}}</a> <a href="/shopping/new?maintenance={{$m.ID}}" role="button" class="outline">+ {{t "shopping.title"}}</a></div>
+  {{else}}<form method="post" action="/maintenances/{{$m.ID}}/reopen" class="actions"><button type="submit" class="outline">{{t "maintenance.reopen"}}</button></form>{{end}}
+</div>
+{{/* Adding or removing a step with htmx swaps status and steps in place,
+     so the page doesn't jump. */}}
+<div id="maintenance-live">
+<div id="maintenance-status" aria-live="polite">
+  <p>{{date $m.PerformedAt}} · {{km $m.DistanceM}} · {{template "maintenance-status" $m}}{{if .Saved}} · <small>{{t "maintenance.saved"}}</small>{{end}}</p>
+  {{if $m.Total}}<progress value="{{$m.Done}}" max="{{$m.Total}}" aria-hidden="true"></progress>{{end}}
+  {{template "error" .}}
+  <p role="alert" class="save-error" data-save-error hidden>{{t "maintenance.not_saved"}}</p>
+</div>
+
+{{if $m.Open}}
+<form method="post" action="/maintenances/{{$m.ID}}"
+      hx-post="/maintenances/{{$m.ID}}" hx-trigger="change" hx-sync="this:replace"
+      hx-target="#maintenance-status" hx-select="#maintenance-status" hx-swap="outerHTML"{{with .FollowUpsOOB}} hx-select-oob="{{.}}"{{end}}
+      hx-disinherit="*">
+  {{/* Enter in a field saves, not the first follow-up button. */}}
+  <button type="submit" class="default-submit" tabindex="-1" aria-hidden="true"></button>
+  {{range .Phases}}
+  <section class="phase">
+    {{with .Phase}}<h2>{{t (print "phase." .)}}</h2>{{end}}
+    {{range .Groups}}
+    {{with .Assembly}}<h3 class="assembly">{{t (print "assembly." .)}}</h3>{{end}}
+    <ol class="steps">
+      {{range .Steps}}
+      {{$st := .}}
+      <li id="mstep-{{.ID}}">
+        <article>
+          <header><label><input type="checkbox" name="done_{{.ID}}" value="1"{{if $.Form.Get (print "done_" .ID)}} checked{{end}}> <strong>{{.Title}}</strong></label></header>
+          {{with .Origin}}<p><small>{{t "maintenance.follow_up.of" .Title}}</small></p>{{end}}
+          {{with .Instructions}}<p class="multiline">{{.}}</p>{{end}}
+          {{range .Hints}}<p class="hint"><small>{{t (print "hint." .)}}</small></p>{{end}}
+          {{range .Groups}}{{template "maintenance-values" (dict "G" . "Form" $.Form "Open" true)}}{{end}}
+          {{if or .Offers .Added}}
+          <div class="follow-ups" id="follow-ups-{{.ID}}">
+            <small>{{t "maintenance.follow_up.offers"}}:</small>
+            {{range .Added}}<a href="#mstep-{{.ID}}">→ {{.Title}}</a>{{end}}
+            {{range .Offers}}<button type="submit" formaction="/maintenances/{{$m.ID}}/follow-up" name="follow_up" value="{{$st.ID}}:{{.ID}}" hx-post="/maintenances/{{$m.ID}}/follow-up" {{template "live-swap"}}{{if not $st.Needed}} class="outline"{{end}}>+ {{.Title}}</button>{{end}}
+            {{if and .Offers .Needed}}<span class="badge danger">{{t "maintenance.follow_up.needed"}}</span>{{end}}
+          </div>
+          {{end}}
+          {{$note := $.Form.Get (print "note_" .ID)}}
+          <details class="step-note"{{if $note}} open{{end}}>
+            <summary>{{t "maintenance.field.note"}}</summary>
+            <input name="note_{{.ID}}" aria-label="{{t "maintenance.field.note"}}: {{.Title}}" value="{{$note}}">
+          </details>
+          {{if .Removable}}<div class="step-remove"><button type="submit" formaction="/maintenances/{{$m.ID}}/steps/{{.ID}}/remove" hx-post="/maintenances/{{$m.ID}}/steps/{{.ID}}/remove" {{template "live-swap"}} class="outline danger">{{t "maintenance.remove_step"}}</button></div>{{end}}
+        </article>
+      </li>
+      {{end}}
+    </ol>
+    {{end}}
+  </section>
+  {{end}}
+  <label>{{t "maintenance.field.notes"}} <textarea name="notes">{{.Form.Get "notes"}}</textarea></label>
+  <div class="actions">
+    <button type="submit">{{t "action.save"}}</button>
+    <button type="submit" name="complete" value="1" class="outline">{{t "maintenance.complete"}}</button>
+  </div>
+</form>
+{{else}}
+{{range .Phases}}
+<section class="phase">
+  {{with .Phase}}<h2>{{t (print "phase." .)}}</h2>{{end}}
+  {{range .Groups}}
+  {{with .Assembly}}<h3 class="assembly">{{t (print "assembly." .)}}</h3>{{end}}
+  <ol class="steps">
+    {{range .Steps}}
+    <li>
+      <article>
+        <header><strong>{{if .Done}}✓{{else}}✗{{end}} {{.Title}}</strong>
+          {{if .Dismissed}} <span class="badge">{{t "maintenance.follow_up.dismissed"}}</span>{{else if .OpenWork}} <span class="badge danger">{{t "due.open"}}</span>{{end}}</header>
+        {{with .Origin}}<p><small>{{t "maintenance.follow_up.of" .Title}}</small></p>{{end}}
+        {{with .Instructions}}<p class="multiline">{{.}}</p>{{end}}
+          {{range .Hints}}<p class="hint"><small>{{t (print "hint." .)}}</small></p>{{end}}
+        {{range .Groups}}{{template "maintenance-values" (dict "G" . "Form" $.Form "Open" false)}}{{end}}
+        {{with .Note}}<p><small>{{t "maintenance.field.note"}}: {{.}}</small></p>{{end}}
+        {{if .OpenWork}}<form method="post" action="/maintenances/{{$m.ID}}/steps/{{.ID}}/dismiss" class="open-work"><button type="submit" class="outline">{{t "due.dismiss"}}</button></form>{{end}}
+      </article>
+    </li>
+    {{end}}
+  </ol>
+  {{end}}
+</section>
+{{end}}
+{{with $m.Notes}}<p class="multiline">{{.}}</p>{{end}}
+{{end}}
+</div>
+
+<div class="actions end"><a href="/maintenances/{{$m.ID}}/delete" role="button" class="outline danger">{{t "maintenance.delete"}}</a></div>
+{{end}}
+
+{{/* htmx attributes of a button that saves the form and swaps status and
+     steps; it waits for a running autosave. */}}
+{{define "live-swap"}}hx-target="#maintenance-live" hx-select="#maintenance-live" hx-swap="outerHTML" hx-sync="closest form:queue last"{{end}}

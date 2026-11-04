@@ -1,0 +1,45 @@
+{{define "title"}}{{t "component.replace"}}{{end}}
+
+{{define "content"}}
+{{$c := .C}}
+<nav aria-label="breadcrumb"><ul><li><a href="/components">{{t "components.title"}}</a></li><li><a href="/components/{{$c.ID}}">{{template "component-name" $c}}</a></li><li>{{t "component.replace"}}</li></ul></nav>
+<h1>{{t "component.replace"}}: {{template "component-name" $c}}</h1>
+{{with $c.Current}}<p>{{t "component.installed_on" $c.BikeName (date .InstalledAt) (km .InstalledM)}}{{with .Position}} ({{t (print "position." .)}}){{end}}</p>{{end}}
+{{if .Existing}}
+<p><a href="/components/{{$c.ID}}/replace">{{t "replace.create_new"}}</a></p>
+{{else if .Spares}}
+<p><a href="/components/{{$c.ID}}/replace?existing=1">{{t "replace.use_existing"}}</a></p>
+{{end}}
+{{template "error" .}}
+<form method="post" action="/components/{{$c.ID}}/replace">
+  {{if .Existing}}<input type="hidden" name="existing" value="1">{{end}}
+  <fieldset>
+    <legend>{{t "replace.when"}}</legend>
+    {{template "mount-fields" .}}
+  </fieldset>
+  <fieldset>
+    <legend>{{t "replace.old"}}</legend>
+    <label><input type="checkbox" name="retire" value="1"{{if .Form.Get "retire"}} checked{{end}}> {{t "replace.retire_old"}}</label>
+    <label>{{t "retire.field.reason"}}
+      <select name="reason">{{range .Reasons}}<option value="{{.}}"{{if eq . ($.Form.Get "reason")}} selected{{end}}>{{t (print "retire.reason." .)}}</option>{{end}}</select>
+    </label>
+    <small>{{t "replace.keep_hint"}}</small>
+  </fieldset>
+  <fieldset>
+    <legend>{{t "replace.new"}}</legend>
+    {{if not .Existing}}
+    {{template "component-fields" .}}
+    {{else if .Spares}}
+    <label>{{t "components.col.component"}}<span class="req" aria-hidden="true">*</span>
+      <select name="component" required>
+        {{range .Spares}}<option value="{{.ID}}"{{if eq .ID ($.Form.Get "component")}} selected{{end}}>{{.TypeName}}{{if or .Manufacturer .Model}}: {{.Manufacturer}} {{.Model}}{{end}}</option>{{end}}
+      </select>
+    </label>
+    {{else}}
+    <p>{{t "bike.components.no_spares"}}</p>
+    {{end}}
+  </fieldset>
+  {{template "duplicate-confirm" .}}
+  <button type="submit">{{t "component.replace"}}</button>
+</form>
+{{end}}

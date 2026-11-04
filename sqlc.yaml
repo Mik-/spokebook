@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: sqlite
+    schema: internal/app/spokebook/store/sqlite/migrations
+    queries: internal/app/spokebook/store/sqlite/queries
+    gen:
+      go:
+        package: db
+        out: internal/app/spokebook/store/sqlite/db

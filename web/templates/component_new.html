@@ -1,0 +1,18 @@
+{{define "title"}}{{if .Source}}{{t "component.duplicate"}}{{else}}{{t "components.new"}}{{end}}{{end}}
+
+{{define "content"}}
+{{with .Source}}
+<nav aria-label="breadcrumb"><ul><li><a href="/components">{{t "components.title"}}</a></li><li><a href="/components/{{.ID}}">{{t "action.back"}}</a></li><li>{{t "component.duplicate"}}</li></ul></nav>
+<h1>{{t "component.duplicate"}}</h1>
+<p>{{t "component.duplicate.hint"}}</p>
+{{else}}
+<nav aria-label="breadcrumb"><ul><li><a href="/components">{{t "components.title"}}</a></li><li>{{t "components.new"}}</li></ul></nav>
+<h1>{{t "components.new"}}</h1>
+{{end}}
+{{template "error" .}}
+<form method="post" action="/components">
+  {{with .Source}}<input type="hidden" name="duplicate_of" value="{{.ID}}">{{end}}
+  {{template "component-fields" .}}
+  <button type="submit">{{t "components.create"}}</button>
+</form>
+{{end}}

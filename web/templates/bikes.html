@@ -1,0 +1,60 @@
+{{define "title"}}{{t "bikes.title"}}{{end}}
+
+{{define "content"}}
+<div class="page-head">
+  <h1>{{t "bikes.title"}}</h1>
+  <a href="/bikes/new" role="button" title="{{t "bikes.new"}}">+ {{t "action.new"}}</a>
+</div>
+{{if .Bikes}}
+<div class="cards">
+  {{range $bike := .Bikes}}
+  <article class="bike-card">
+    {{with .CoverID}}<a href="/bikes/{{$bike.ID}}" class="card-photo" tabindex="-1" aria-hidden="true"><img src="/attachments/{{.}}/thumb" alt=""></a>{{end}}
+    <header>
+      <h2><a href="/bikes/{{.ID}}">{{.Name}}</a></h2>
+      {{with .Type}}<small>{{.}}</small>{{end}}
+    </header>
+    <p class="figure">{{with .DistanceM}}{{km .}}{{else}}–{{end}}</p>
+    {{with .Alerts}}
+    <ul class="card-alerts">
+      {{range .}}<li><a href="/components/{{.ID}}">{{template "component-name" .}}</a> {{if .Wear.OverDistance}}<span class="badge danger">{{t "component.wear.over_distance"}}</span>{{end}}{{if .Wear.Overdue}}<span class="badge danger">{{t "component.wear.overdue"}}</span>{{end}}</li>{{end}}
+    </ul>
+    {{end}}
+    <dl class="stacked">
+      {{with .Due}}
+      <dt>{{t "due.next"}}</dt>
+      <dd><a href="/bikes/{{$bike.ID}}">{{template "due-name" .}}</a> {{template "due-badge" .}}<br><small>{{template "due-when" .}}</small>{{template "due-bar" .}}</dd>
+      {{end}}
+      <dt>{{t "bikes.last_maintenance"}}</dt>
+      <dd>{{with .Last}}<a href="/maintenances/{{.ID}}">{{date .PerformedAt}} · {{template "maintenance-name" .}}</a><br>{{template "maintenance-status" .}}{{else}}{{t "maintenances.empty"}}{{end}}</dd>
+      {{with .Worn}}
+      <dt>{{t "bikes.most_worn"}}</dt>
+      <dd><a href="/components/{{.ID}}">{{template "component-name" .}}</a> · {{t "component.wear.percent" .Wear.Percent}}{{template "wear-bar" .}}</dd>
+      {{end}}
+    </dl>
+    {{with .Last}}{{if .Open}}<footer><a href="/maintenances/{{.ID}}" role="button">{{t "maintenance.continue"}}</a></footer>{{end}}{{end}}
+  </article>
+  {{end}}
+</div>
+{{else}}
+<p>{{t "bikes.empty"}}</p>
+{{end}}
+{{with .Retired}}
+<details>
+  <summary>{{t "retire.list" (len .)}}</summary>
+  <div class="overflow-auto">
+  <table>
+    <tbody>
+      {{range .}}
+      <tr>
+        <td><a href="/bikes/{{.ID}}">{{.Name}}</a>{{with .Type}}<br><small>{{.}}</small>{{end}}</td>
+        <td>{{date .RetiredAt}}<br><small>{{t (print "retire.reason." .RetireReason)}}</small></td>
+        <td>{{with .DistanceM}}{{km .}}{{else}}–{{end}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+</details>
+{{end}}
+{{end}}

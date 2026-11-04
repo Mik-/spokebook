@@ -1,0 +1,19 @@
+{{define "title"}}{{t "bike.components.add"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.Bike.ID}}">{{.Bike.Name}}</a></li><li><a href="/bikes/{{.Bike.ID}}/components">{{t "bike.components"}}</a></li><li>{{t "action.new"}}</li></ul></nav>
+<h1>{{t "bike.components.add"}}: {{.Bike.Name}}</h1>
+{{template "error" .}}
+<form method="post" action="/bikes/{{.Bike.ID}}/components">
+  <fieldset>
+    <legend>{{t "component.installation"}}</legend>
+    {{template "mount-fields" .}}
+  </fieldset>
+  <fieldset>
+    <legend>{{t "replace.new"}}</legend>
+    {{template "component-fields" .}}
+  </fieldset>
+  {{template "duplicate-confirm" .}}
+  <button type="submit">{{t "bike.components.add"}}</button>
+</form>
+{{end}}

@@ -1,0 +1,32 @@
+{{define "title"}}{{t "modules.title"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/steps">{{t "steps.title"}}</a></li><li>{{t "modules.title"}}</li></ul></nav>
+<h1>{{t "modules.title"}}</h1>
+<p>{{t "modules.intro"}}</p>
+{{range $m := .Modules}}
+<section class="module">
+  <h2>{{t (print "feature." .Feature)}}</h2>
+  {{if or .Added .Dropped .Hinted}}
+  <ul class="effects">
+    {{range .Added}}
+    <li><span class="effect add" title="{{t "modules.added"}}">+</span>
+      <a href="/steps/{{.ID}}">{{.Title}}</a> {{template "level-ladder" .Levels}}
+      {{with .Replaces}}<small>{{t "step.replaces" (index $.Titles .)}}</small>{{end}}</li>
+    {{end}}
+    {{range .Dropped}}
+    <li><span class="effect drop" title="{{t "modules.dropped"}}">−</span>
+      <a href="/steps/{{.ID}}">{{.Title}}</a> <small>{{t "modules.dropped"}}</small></li>
+    {{end}}
+    {{range .Hinted}}
+    <li><span class="effect hint" title="{{t "modules.hinted"}}">i</span>
+      <div><small>{{t (print "hint." .ID)}}</small><br>
+      <small>{{t "modules.hinted"}} {{range $i, $s := .Steps}}{{if $i}}, {{end}}<a href="/steps/{{$s.ID}}">{{$s.Title}}</a>{{end}}</small></div></li>
+    {{end}}
+  </ul>
+  {{else}}
+  <p><small>{{t "modules.none"}}</small></p>
+  {{end}}
+</section>
+{{end}}
+{{end}}

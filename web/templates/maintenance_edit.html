@@ -1,0 +1,15 @@
+{{define "title"}}{{t "maintenance.edit_date"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.Bike.ID}}">{{.Bike.Name}}</a></li><li><a href="/maintenances/{{.M.ID}}">{{template "maintenance-name" .M}}</a></li><li>{{t "action.edit"}}</li></ul></nav>
+<h1>{{t "maintenance.edit_date"}}</h1>
+{{template "error" .}}
+<form method="post" action="/maintenances/{{.M.ID}}/edit">
+  <div class="grid">
+    <label>{{t "maintenance.field.date"}}<span class="req" aria-hidden="true">*</span> <input type="date" name="date" value="{{.Form.Get "date"}}" required></label>
+    <label>{{t "component.field.odometer_km"}}<span class="req" aria-hidden="true">*</span> <input type="number" name="km" min="0" step="0.1" inputmode="decimal" value="{{.Form.Get "km"}}" required></label>
+  </div>
+  <small>{{t "maintenance.edit_date.hint"}}</small>
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+{{end}}

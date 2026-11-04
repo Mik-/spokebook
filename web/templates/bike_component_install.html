@@ -1,0 +1,21 @@
+{{define "title"}}{{t "bike.components.install_spare"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.Bike.ID}}">{{.Bike.Name}}</a></li><li><a href="/bikes/{{.Bike.ID}}/components">{{t "bike.components"}}</a></li><li>{{t "bike.components.install_spare"}}</li></ul></nav>
+<h1>{{t "bike.components.install_spare"}}: {{.Bike.Name}}</h1>
+{{template "error" .}}
+{{if not .Spares}}
+<p>{{t "bike.components.no_spares"}} <a href="/bikes/{{.Bike.ID}}/components/new">{{t "bike.components.add"}}</a></p>
+{{else}}
+<form method="post" action="/bikes/{{.Bike.ID}}/components/install">
+  <label>{{t "components.col.component"}}<span class="req" aria-hidden="true">*</span>
+    <select name="component" required>
+      {{range .Spares}}<option value="{{.ID}}"{{if eq .ID ($.Form.Get "component")}} selected{{end}}>{{.TypeName}}{{if or .Manufacturer .Model}}: {{.Manufacturer}} {{.Model}}{{end}}</option>{{end}}
+    </select>
+  </label>
+  {{template "mount-fields" .}}
+  {{template "duplicate-confirm" .}}
+  <button type="submit">{{t "component.install"}}</button>
+</form>
+{{end}}
+{{end}}

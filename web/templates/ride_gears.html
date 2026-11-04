@@ -1,0 +1,26 @@
+{{define "title"}}{{t "rides.gears"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/rides">{{t "rides.title"}}</a></li><li>{{t "rides.gears"}}</li></ul></nav>
+<h1>{{t "rides.gears"}}</h1>
+<p>{{t "rides.gears.intro"}}</p>
+{{if .Gears}}
+<div class="overflow-auto">
+<table>
+  <thead><tr><th>{{t "rides.gear.col.source"}}</th><th>{{t "rides.col.bike"}}</th><th>{{t "rides.gear.col.rides"}}</th><th></th></tr></thead>
+  <tbody>
+    {{range .Gears}}
+    <tr>
+      <td>{{gearName .GearKey .Name}}<br><small>{{t (print "rides.source." .Source)}}</small></td>
+      <td data-label="{{t "rides.col.bike"}}">{{if .BikeID}}<a href="/bikes/{{.BikeID}}">{{.BikeName}}</a>{{else}}{{t "rides.unassigned"}}{{end}}</td>
+      <td data-label="{{t "rides.gear.col.rides"}}">{{.Rides}}</td>
+      <td class="row-action"><a href="/ride-gears/{{.ID}}/edit" role="button" class="outline">{{t "action.edit"}}</a></td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+</div>
+{{else}}
+<p>{{t "rides.gears.empty"}}</p>
+{{end}}
+{{end}}

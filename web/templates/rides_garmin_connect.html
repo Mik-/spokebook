@@ -1,0 +1,23 @@
+{{define "title"}}{{if .Source}}{{t "garmin.settings"}}{{else}}{{t "garmin.connect"}}{{end}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/rides">{{t "rides.title"}}</a></li><li><a href="/rides/garmin">{{t "garmin.title"}}</a></li><li>{{if .Source}}{{t "garmin.settings"}}{{else}}{{t "garmin.connect"}}{{end}}</li></ul></nav>
+<h1>{{if .Source}}{{t "garmin.settings"}}{{else}}{{t "garmin.connect"}}{{end}}</h1>
+{{template "error" .}}
+{{if not .Enabled}}
+<p role="alert">{{t "garmin.disabled"}}</p>
+{{else}}
+<p>{{t "garmin.key_howto"}} <a href="https://connect.garmin.com/app/settings/personalApiToken" rel="noopener noreferrer" target="_blank">connect.garmin.com/app/settings/personalApiToken</a></p>
+<form method="post" action="/rides/garmin/connect">
+  <label>{{t "garmin.field.key"}}{{if not .Source}}<span class="req" aria-hidden="true">*</span>{{end}}
+    <input type="password" name="key" autocomplete="off" maxlength="1000"{{if not .Source}} required{{end}}>
+    <small>{{if .Source}}{{t "garmin.key_keep"}}{{else}}{{t "garmin.key_hint"}}{{end}}</small>
+  </label>
+  <label>{{t "garmin.field.since"}}<span class="req" aria-hidden="true">*</span>
+    <input type="date" name="since" value="{{.Form.Get "since"}}" required>
+    <small>{{with .Until}}{{t "garmin.until" .}} {{t "garmin.since_earlier"}} {{else}}{{if $.Form.Get "from_rides"}}{{t "garmin.since_default"}} {{end}}{{end}}{{t "garmin.since_hint"}}</small>
+  </label>
+  <button type="submit">{{if .Source}}{{t "action.save"}}{{else}}{{t "garmin.connect"}}{{end}}</button>
+</form>
+{{end}}
+{{end}}

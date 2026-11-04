@@ -1,0 +1,95 @@
+{{define "title"}}{{template "component-name" .C}}{{end}}
+
+{{define "content"}}
+{{$c := .C}}
+<nav aria-label="breadcrumb"><ul>{{template "component-crumbs" .From}}<li>{{template "component-name" $c}}</li></ul></nav>
+<div class="page-head">
+  <h1>{{template "component-name" $c}}</h1>
+  <div class="actions">
+    <a href="/components/{{$c.ID}}/edit{{$.FromQuery}}" role="button" class="outline">{{t "action.edit"}}</a>
+    <a href="/components/{{$c.ID}}/duplicate" role="button" class="outline">{{t "component.duplicate"}}</a>
+    <a href="/shopping/new?component={{$c.ID}}" role="button" class="outline">{{t "component.reorder"}}</a>
+  </div>
+</div>
+{{template "retired-banner" $c}}
+<p>{{t "component.mileage"}}: {{template "component-wear" $c}}</p>
+{{template "wear-bar" $c}}
+
+<dl>
+  <dt>{{t "component.field.type"}}</dt><dd>{{$c.TypeName}}</dd>
+  {{with $c.Manufacturer}}<dt>{{t "component.field.manufacturer"}}</dt><dd>{{.}}</dd>{{end}}
+  {{with $c.Model}}<dt>{{t "component.field.model"}}</dt><dd>{{.}}</dd>{{end}}
+  {{with $c.PartNumber}}<dt>{{t "component.field.part_number"}}</dt><dd>{{.}}</dd>{{end}}
+  {{with $c.PurchasedAt}}<dt>{{t "component.field.purchased_at"}}</dt><dd>{{date .}}</dd>{{end}}
+  {{with $c.Dealer}}<dt>{{t "component.field.dealer"}}</dt><dd>{{.}}</dd>{{end}}
+  {{with $c.PriceCents}}<dt>{{t "component.field.price"}}</dt><dd>{{money . $c.Currency}}</dd>{{end}}
+  {{with $c.MaxDistanceM}}<dt>{{t "component.field.max_km"}}</dt><dd>{{km .}}</dd>{{end}}
+  {{with $c.ReplaceBy}}<dt>{{t "component.field.replace_by"}}</dt><dd>{{date .}}</dd>{{end}}
+  {{with $c.URL}}<dt>{{t "component.field.url"}}</dt><dd><a href="{{.}}" rel="noopener noreferrer" target="_blank">{{.}}</a></dd>{{end}}
+  {{with $c.Notes}}<dt>{{t "component.field.notes"}}</dt><dd>{{.}}</dd>{{end}}
+</dl>
+
+{{with .Values}}
+<section>
+  <h2>{{t "value.title"}}</h2>
+  <div class="overflow-auto">
+  <table>
+    <thead><tr><th>{{t "value.field.label"}}</th><th>{{t "value.field.kind"}}</th><th>{{t "value.title"}}</th><th>{{t "value.field.hint"}}</th></tr></thead>
+    <tbody>
+      {{range .}}<tr><td>{{.Label}}{{if .FromType}} <small>({{t "value.from_type"}})</small>{{end}}</td><td data-label="{{t "value.field.kind"}}">{{t (print "value.kind." .Kind)}}</td><td data-label="{{t "value.title"}}">{{value .Value}}</td><td data-label="{{t "value.field.hint"}}">{{.Hint}}</td></tr>{{end}}
+    </tbody>
+  </table>
+  </div>
+</section>
+{{end}}
+
+<section>
+  <h2>{{t "component.installation"}}</h2>
+  {{if not $c.Active}}
+  <p>{{t "component.not_installed"}}</p>
+  {{else if $c.Current}}
+  {{with $c.Current}}<p>{{t "component.installed_on" $c.BikeName (date .InstalledAt) (km .InstalledM)}}{{with .Position}} ({{t (print "position." .)}}){{end}}</p>{{end}}
+  <div class="actions">
+    <a href="/components/{{$c.ID}}/replace" role="button">{{t "component.replace"}}</a>
+    <a href="/components/{{$c.ID}}/remove" role="button" class="outline">{{t "component.remove"}}</a>
+  </div>
+  {{else}}
+  <p>{{t "component.not_installed"}}</p>
+  <div class="actions"><a href="/components/{{$c.ID}}/install" role="button">{{t "component.install"}}</a></div>
+  {{end}}
+</section>
+
+{{if .Installations}}
+<section>
+  <h2>{{t "component.history"}}</h2>
+  <div class="overflow-auto">
+  <table>
+    <thead>
+      <tr><th>{{t "component.field.bike"}}</th><th>{{t "component.history.from"}}</th><th>{{t "component.history.to"}}</th><th>{{t "component.history.distance"}}</th><th></th></tr>
+    </thead>
+    <tbody>
+      {{range .Installations}}
+      <tr>
+        <td><a href="/bikes/{{.BikeID}}">{{.BikeName}}</a>{{with .Position}}<br><small>{{t (print "position." .)}}</small>{{end}}</td>
+        <td data-label="{{t "component.history.from"}}">{{date .InstalledAt}}<br><small>{{km .InstalledM}}</small></td>
+        <td data-label="{{t "component.history.to"}}">{{with .RemovedAt}}{{date .}}{{else}}{{t "component.history.now"}}{{end}}{{with .RemovedM}}<br><small>{{km .}}</small>{{end}}</td>
+        <td data-label="{{t "component.history.distance"}}">{{km .DistanceM}}</td>
+        <td class="row-action"><a href="/installations/{{.ID}}/edit" role="button" class="outline">{{t "action.edit"}}</a></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+</section>
+{{end}}
+
+{{template "attachments" (dict "Target" .Target "Items" .Attachments)}}
+
+<div class="actions end">
+{{if $c.Active}}
+  <a href="/components/{{$c.ID}}/retire" role="button" class="outline danger">{{t "retire.component"}}</a>
+{{else}}
+  <form method="post" action="/components/{{$c.ID}}/reactivate"><button type="submit" class="outline">{{t "retire.reactivate"}}</button></form>
+{{end}}
+</div>
+{{end}}

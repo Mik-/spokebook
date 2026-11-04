@@ -1,0 +1,30 @@
+{{define "title"}}{{t "shopping.title"}}{{end}}
+
+{{define "content"}}
+<div class="page-head">
+  <h1>{{t "shopping.title"}}</h1>
+  <div class="actions"><a href="/shopping/new" role="button">+ {{t "action.new"}}</a></div>
+</div>
+{{if .Items}}
+<div class="overflow-auto">
+<table>
+  <thead><tr><th>{{t "shopping.col.item"}}</th><th></th><th></th></tr></thead>
+  <tbody>
+    {{range .Items}}
+    <tr{{if .Bought}} class="bought"{{end}}>
+      <td>{{if .Bought}}<s>{{.Text}}</s> <small>{{t "shopping.bought_on" (date .BoughtAt)}}</small>{{else}}{{.Text}}{{end}}</td>
+      <td class="row-action">
+        {{if .Bought}}<form method="post" action="/shopping/{{.ID}}/open"><button type="submit" class="outline">{{t "shopping.unbought"}}</button></form>
+        {{else}}<form method="post" action="/shopping/{{.ID}}/bought"><button type="submit" class="outline">{{t "shopping.bought"}}</button></form>{{end}}
+      </td>
+      <td class="row-action"><a href="/shopping/{{.ID}}/edit" role="button" class="outline">{{t "action.edit"}}</a></td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+</div>
+{{else}}
+<p>{{t "shopping.empty"}}</p>
+{{end}}
+{{if .Bought}}<div class="actions end"><a href="/shopping/bought/delete" role="button" class="outline danger">{{t "shopping.remove_bought"}}</a></div>{{end}}
+{{end}}

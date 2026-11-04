@@ -1,0 +1,26 @@
+{{define "title"}}{{t "intervals.title"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/steps">{{t "steps.title"}}</a></li><li>{{t "intervals.title"}}</li></ul></nav>
+<h1>{{t "intervals.title"}}</h1>
+{{template "error" .}}
+<p>{{t "intervals.hint"}}</p>
+<form method="post" action="/intervals">
+  <div class="overflow-auto">
+  <table class="value-rows intervals">
+    <thead><tr><th>{{t "maintenance.field.level"}}</th><th>{{t "interval.months"}}</th><th>{{t "interval.km"}}</th></tr></thead>
+    <tbody>
+      {{range .Levels}}
+      <tr>
+        <td>{{t (print "level." .)}}</td>
+        <td><input type="number" name="{{.}}_months" min="1" max="120" step="1" inputmode="numeric" aria-label="{{t (print "level." .)}}: {{t "interval.months"}}" value="{{$.Form.Get (print . "_months")}}"></td>
+        <td><input type="number" name="{{.}}_km" min="0.1" step="0.1" inputmode="decimal" aria-label="{{t (print "level." .)}}: {{t "interval.km"}}" value="{{$.Form.Get (print . "_km")}}"></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+  <small>{{t "intervals.empty_hint"}}</small>
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+{{end}}

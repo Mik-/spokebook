@@ -1,0 +1,15 @@
+{{define "title"}}{{t "bike.odometer.edit"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.Reading.BikeID}}">{{t "action.back"}}</a></li><li>{{t "bike.odometer.edit"}}</li></ul></nav>
+<h1>{{t "bike.odometer.edit"}}</h1>
+{{template "error" .}}
+<form method="post" action="{{.Path}}">
+  <div class="grid">
+    <label>{{t "bike.odometer.field.date"}}<span class="req" aria-hidden="true">*</span> <input type="date" name="date" value="{{.Form.Get "date"}}" required></label>
+    <label>{{t "bike.odometer.field.km"}}<span class="req" aria-hidden="true">*</span> <input type="number" name="km" min="0" step="0.1" inputmode="decimal" value="{{.Form.Get "km"}}" required></label>
+  </div>
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+<div class="actions end"><a href="{{.Path}}/delete" role="button" class="outline danger">{{t "bike.odometer.delete"}}</a></div>
+{{end}}

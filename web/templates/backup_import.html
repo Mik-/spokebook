@@ -1,0 +1,13 @@
+{{define "title"}}{{t "backup.import.title"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/account">{{t "account.title"}}</a></li><li>{{t "backup.import.title"}}</li></ul></nav>
+<h1>{{t "backup.import.title"}}</h1>
+{{template "error" .}}
+<p>{{t "backup.import.warning"}}</p>
+<form method="post" action="/account/backup/import" enctype="multipart/form-data">
+  <label>{{t "backup.import.field.file"}}<span class="req" aria-hidden="true">*</span> <input type="file" name="file" accept=".zip,application/zip,.json,application/json" required></label>
+  <label><input type="checkbox" name="confirm" value="1" required> {{t "backup.import.confirm"}}</label>
+  <button type="submit" class="danger">{{t "backup.import.submit"}}</button>
+</form>
+{{end}}

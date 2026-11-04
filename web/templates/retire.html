@@ -1,0 +1,20 @@
+{{define "title"}}{{.Title}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="{{.ListURL}}">{{.ListName}}</a></li><li><a href="{{.Back}}">{{.Name}}</a></li><li>{{.Title}}</li></ul></nav>
+<h1>{{.Title}}: {{.Name}}</h1>
+{{template "error" .}}
+<form method="post" action="{{.Action}}">
+  <div class="grid">
+    <label>{{t "retire.field.date"}}<span class="req" aria-hidden="true">*</span> <input type="date" name="date" value="{{or (.Form.Get "date") .Today}}" required></label>
+    <label>{{t "retire.field.reason"}}
+      <select name="reason">{{range .Reasons}}<option value="{{.}}"{{if eq . ($.Form.Get "reason")}} selected{{end}}>{{t (print "retire.reason." .)}}</option>{{end}}</select>
+    </label>
+  </div>
+  {{with .Hint}}
+  <label>{{t "component.field.odometer_km"}} <input type="number" name="km" min="0" step="0.1" inputmode="decimal" value="{{$.Form.Get "km"}}"></label>
+  <small>{{.}} {{t "component.odometer_hint"}}</small>
+  {{end}}
+  <button type="submit" class="danger">{{t "retire.submit"}}</button>
+</form>
+{{end}}

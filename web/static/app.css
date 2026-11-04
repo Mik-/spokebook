@@ -1,0 +1,466 @@
+/* Additions to Pico CSS (vendor/pico-*.min.css). Colors come from Pico's
+   variables, so light and dark mode work without extra rules. */
+
+/* Brand colors: a workshop green instead of Pico's azure, plus an amber
+   for things in progress or close to a limit. The selectors match Pico's
+   theme blocks, so these win over them. */
+:root:not([data-theme=dark]), [data-theme=light] {
+  --pico-primary: #007a50;
+  --pico-primary-background: #007a50;
+  --pico-primary-underline: rgba(0, 122, 80, .5);
+  --pico-primary-hover: #004d33;
+  --pico-primary-hover-background: #006241;
+  --pico-primary-focus: rgba(0, 122, 80, .35);
+  --pico-text-selection-color: rgba(0, 122, 80, .2);
+  --app-warn: #a15c00;
+  --app-header-background: #f4f7f5;
+}
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --pico-primary: #3ccf95;
+    --pico-primary-background: #007a50;
+    --pico-primary-underline: rgba(60, 207, 149, .5);
+    --pico-primary-hover: #7be0b6;
+    --pico-primary-hover-background: #008f5e;
+    --pico-primary-focus: rgba(60, 207, 149, .35);
+    --pico-text-selection-color: rgba(60, 207, 149, .2);
+    --app-warn: #e8a33d;
+    --app-header-background: #181d25;
+  }
+}
+[data-theme=dark] {
+  --pico-primary: #3ccf95;
+  --pico-primary-background: #007a50;
+  --pico-primary-underline: rgba(60, 207, 149, .5);
+  --pico-primary-hover: #7be0b6;
+  --pico-primary-hover-background: #008f5e;
+  --pico-primary-focus: rgba(60, 207, 149, .35);
+  --pico-text-selection-color: rgba(60, 207, 149, .2);
+  --app-warn: #e8a33d;
+  --app-header-background: #181d25;
+}
+
+/* A tighter type scale than Pico's, so pages read like an app. */
+h1 { --pico-font-size: 1.75rem; }
+h2 { --pico-font-size: 1.375rem; }
+
+/* Header: a full-width bar with the brand, the sections and logout. */
+body > header {
+  padding-block: .25rem; background: var(--app-header-background);
+  border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
+}
+body > header nav ul.sections { margin-left: auto; }
+nav .brand { display: flex; align-items: center; gap: .4rem; font-weight: 700; text-decoration: none; }
+nav .brand .logo { width: 1.4em; height: 1.4em; }
+nav a[aria-current="page"], nav summary.current { font-weight: 600; text-decoration: underline; text-underline-offset: .3em; }
+/* Menu entries: an icon before the label. */
+body > header nav :is(a, summary, button) { display: inline-flex; align-items: center; gap: .35rem; }
+body > header .icon { width: 1.1em; height: 1.1em; flex: none; }
+/* The dropdowns' summaries look like the links next to them, not like a
+   select field. */
+body > header details.dropdown > summary:not([role]) {
+  height: auto; border: none; background: none; color: var(--pico-primary); box-shadow: none;
+}
+body > header details.dropdown[open] > summary:not([role]) { color: var(--pico-primary); }
+body > header details.dropdown > summary + ul li :is(a, button) { display: flex; }
+body > header nav ul { white-space: nowrap; }
+body > header details.dropdown > summary::after { margin-inline-start: 0; }
+body > header details.dropdown > summary + ul a[aria-current="page"] { text-decoration: none; }
+body > main { padding-top: calc(var(--pico-block-spacing-vertical) * 1.5); }
+body > footer { color: var(--pico-muted-color); }
+
+/* Links in lists: the color marks them, underlines would make long
+   lists restless. */
+td a:not([role="button"]) { text-decoration: none; }
+td a:not([role="button"]):hover { text-decoration: underline; }
+
+/* Status badges, e.g. of a maintenance or a component at its limit. */
+.badge {
+  display: inline-block; padding: 0 .55em; border-radius: 1em; white-space: nowrap;
+  font-size: .8em; font-weight: 600; line-height: 1.6; vertical-align: .05em;
+  color: var(--app-badge-color); background: color-mix(in srgb, var(--app-badge-color) 14%, transparent);
+}
+.badge.open { --app-badge-color: var(--app-warn); }
+.badge.done { --app-badge-color: var(--pico-ins-color); }
+.badge.danger { --app-badge-color: var(--pico-del-color); }
+
+/* Progress bars: steps done of a maintenance, distance limit used by a
+   component (amber from 80 %, red at the limit). */
+progress { height: .375rem; margin: .25rem 0 0; }
+#maintenance-status progress { margin-bottom: var(--pico-spacing); }
+progress.wear { display: block; max-width: 12rem; }
+progress.wear.warn { --pico-progress-color: var(--app-warn); }
+progress.wear.over { --pico-progress-color: var(--pico-del-color); }
+
+/* A row at a limit gets a red mark at its start. */
+tr.flagged > td:first-child { box-shadow: inset 3px 0 0 var(--pico-del-color); }
+
+/* Page and section heads: title left, actions right; wraps on phones. */
+.page-head {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: .5rem 1rem; margin-bottom: var(--pico-spacing);
+}
+.page-head h1, .page-head h2 { margin: 0; }
+section { margin-top: calc(var(--pico-spacing) * 2); }
+
+/* Groups of buttons. Smaller buttons in heads and rows. */
+.actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: 0; }
+.actions form { margin: 0; }
+.actions.end { margin-top: calc(var(--pico-spacing) * 3); }
+.page-head [role="button"], .actions [role="button"], .actions button, td button {
+  padding: .4rem .9rem; margin: 0; width: auto;
+}
+td form, td fieldset, td [type="submit"] { margin: 0; }
+td.row-action { text-align: right; white-space: nowrap; width: 1%; }
+/* Buttons in table rows are compact, so lists stay calm. */
+td.row-action [role="button"], td.row-action button { padding: .2rem .6rem; font-size: .875em; }
+/* Bought items on the shopping list stay visible until removed. */
+tr.bought td:first-child { color: var(--pico-muted-color); }
+
+/* Destructive actions: delete, retire. */
+.danger {
+  --pico-color: var(--pico-del-color);
+  --pico-border-color: var(--pico-del-color);
+  --pico-background-color: var(--pico-del-color);
+}
+.danger.outline, a.danger.outline { color: var(--pico-del-color); background: transparent; }
+button.danger:not(.outline) { color: #fff; }
+
+/* Warnings and validation errors. */
+.alert, .alert a { color: var(--pico-del-color); }
+[role="alert"] {
+  color: var(--pico-del-color); border-left: 4px solid var(--pico-del-color);
+  padding: .5rem .75rem; background: color-mix(in srgb, var(--pico-del-color) 8%, transparent);
+}
+.retired { border-left: 4px solid var(--pico-muted-border-color); padding: .5rem .75rem; color: var(--pico-muted-color); }
+
+/* Required fields. */
+.req { color: var(--pico-del-color); margin-left: .15em; }
+
+/* Numbers line up in tables. */
+td { font-variant-numeric: tabular-nums; }
+td small, label small { color: var(--pico-muted-color); }
+
+/* Details as a two-column list. */
+dl { display: grid; grid-template-columns: max-content 1fr; gap: .25rem 1rem; }
+dt { font-weight: 600; }
+dd { margin: 0; }
+
+/* min-width: fieldsets otherwise grow with wide content (value tables,
+   long select options) beyond the screen. */
+fieldset { min-width: 0; }
+fieldset:not([role="group"]) { border: 1px solid var(--pico-muted-border-color); border-radius: var(--pico-border-radius); padding: .5rem 1rem 0; }
+legend { font-weight: 600; padding-inline: .25rem; }
+
+/* Value rows in forms: compact inputs, the label column gets the space. */
+.value-rows td { padding: .25rem; }
+.value-rows input, .value-rows select { margin: 0; }
+.value-rows td:nth-child(2) { width: 10rem; }
+.value-rows td:nth-child(3), .value-rows td:nth-child(4), .value-rows td:nth-child(5) { width: 6rem; }
+.value-rows.intervals td:nth-child(2), .value-rows.intervals td:nth-child(3) { width: 7rem; }
+
+/* The rides of an import with a bike each. */
+.import-rows label { display: inline; margin: 0; }
+.import-rows select { margin: 0; min-width: 11rem; }
+
+/* Many checkboxes in columns, filled top to bottom so alphabetical order
+   reads down each column, e.g. the component types of a step. */
+.checkbox-grid { columns: 12rem; column-gap: 1rem; margin-bottom: .5rem; }
+.checkbox-grid label { break-inside: avoid; }
+
+/* Measured values in maintenance tables. */
+td input[name^="measured_"] { margin: 0; max-width: 8rem; }
+ol.steps h4 { margin: var(--pico-spacing) 0 .25rem; font-size: 1em; }
+
+/* Texts with line breaks, e.g. step instructions. */
+.multiline { white-space: pre-line; }
+
+/* Steps of the catalog or a maintenance: numbered cards. Each assembly
+   group is its own list, so a counter numbers them across the phase. The
+   number sits beside the card head. */
+.phase { counter-reset: step; }
+ol.steps { padding-left: 2rem; }
+ol.steps > li { list-style: none; position: relative; counter-increment: step; }
+ol.steps > li::before {
+  content: counter(step) "."; position: absolute; right: calc(100% + .5rem);
+  top: calc(var(--pico-block-spacing-vertical) * .66); font-weight: 700;
+}
+ol.steps article { margin-bottom: var(--pico-spacing); }
+ol.steps article > header { margin-bottom: var(--pico-spacing); }
+ol.steps header [role="button"], ol.steps header button { padding: .2rem .6rem; font-size: .875em; }
+
+/* Catalog and maintenance: a phase is a section with an underlined title,
+   its assembly groups have small muted subheadings. In the catalog and when
+   adding steps, a phase is collapsible: the title with the step count is
+   the summary. */
+.phase > h2, details.phase > summary { padding-bottom: .25rem; border-bottom: 2px solid var(--pico-primary-border); }
+details.phase > summary h2 { display: inline; margin: 0; --pico-font-size: 1.25rem; }
+details.phase > summary { padding-block: .5rem .25rem; border-bottom: 1px solid var(--pico-muted-border-color); }
+details.phase > summary::after { margin-top: .35rem; }
+details.phase > summary small { margin-left: .5rem; color: var(--pico-muted-color); }
+details.phase[open] > summary { margin-bottom: var(--pico-spacing); }
+details.phase > fieldset { margin-bottom: 0; }
+
+/* Catalog matrix: a table per phase with a body per assembly group, whose
+   head row is a small subheading. The levels of a step are four fixed chips
+   (lit = in the level), so rows compare by eye. */
+details.filter { margin-bottom: var(--pico-spacing); }
+details.filter > summary { color: var(--pico-muted-color); }
+table.catalog tr.assembly th {
+  padding-top: calc(var(--pico-spacing) * 1.25); border-bottom: 0;
+  font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--pico-muted-color);
+}
+table.catalog tbody:first-of-type tr.assembly th { padding-top: .5rem; }
+table.catalog td.row-action form { display: inline-block; margin: 0; }
+table.catalog td.row-action button { width: auto; margin: 0 0 0 .25rem; }
+.badge.module { --app-badge-color: var(--pico-primary); }
+.levels { display: inline-flex; align-items: center; gap: .2rem; vertical-align: middle; white-space: nowrap; }
+.lv {
+  min-width: 2rem; padding: 0 .3rem; text-align: center; font-size: .7rem; line-height: 1.6;
+  border: 1px solid var(--pico-muted-border-color); border-radius: .3rem; color: var(--pico-muted-color); opacity: .6;
+}
+.lv.on { opacity: 1; font-weight: 600; color: var(--pico-primary-inverse); background: var(--pico-primary-background); border-color: var(--pico-primary-background); }
+.lv-demand { font-size: .8rem; color: var(--pico-muted-color); }
+@media (max-width: 575.98px) {
+  .overflow-auto > table.catalog tr.assembly { padding: 0; border-bottom: 0; }
+  .overflow-auto > table.catalog tr.assembly th { flex: 1 0 100%; padding-top: .75rem; }
+}
+
+/* Detail page of a step and module overview: titled sections with facts. */
+.step-section { margin-bottom: calc(var(--pico-spacing) * 1.5); }
+.step-section > h2, section.module > h2 {
+  padding-bottom: .25rem; border-bottom: 1px solid var(--pico-muted-border-color);
+  font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--pico-muted-color);
+}
+section.module > h2 { font-size: 1.1rem; letter-spacing: 0; text-transform: none; color: inherit; border-bottom-width: 2px; border-bottom-color: var(--pico-primary-border); }
+.step-section dl { display: grid; grid-template-columns: 11rem 1fr; gap: .4rem 1.5rem; margin: 0; }
+.step-section dt { color: var(--pico-muted-color); }
+.step-section dd { margin: 0; }
+@media (max-width: 575.98px) {
+  .step-section dl { grid-template-columns: 1fr; gap: 0; }
+  .step-section dd { margin-bottom: .5rem; }
+}
+ul.effects { padding: 0; list-style: none; }
+ul.effects > li { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .75rem; margin: 0; padding: .4rem 0; border-bottom: 1px solid var(--pico-muted-border-color); }
+.effect {
+  display: inline-grid; flex: none; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%;
+  font-size: .85rem; font-weight: 700; color: var(--app-badge-color); background: color-mix(in srgb, var(--app-badge-color) 14%, transparent);
+}
+ul.effects > li > div { flex: 1; min-width: 0; }
+.effect.add { --app-badge-color: var(--pico-ins-color); }
+.effect.drop { --app-badge-color: var(--pico-del-color); }
+.effect.hint { --app-badge-color: var(--pico-primary); }
+h3.assembly {
+  margin: calc(var(--pico-spacing) * 1.25) 0 .5rem;
+  font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--pico-muted-color);
+}
+
+/* A module hint on a step, e.g. carbon paste on clamps. */
+p.hint { padding-left: .75rem; border-left: 3px solid var(--pico-primary-border); }
+
+/* A note behind a checkbox label stays inline (Pico shows small after an
+   input as a block hint). */
+label > [type="checkbox"] + small { display: inline; width: auto; margin: 0; }
+
+/* Login and setup: a narrow card. */
+article.auth { max-width: 28rem; margin: calc(var(--pico-spacing) * 2) auto; }
+article.auth h1 { font-size: 1.75rem; }
+article.auth button { width: 100%; }
+.divider { text-align: center; color: var(--pico-muted-color); margin: var(--pico-spacing) 0; }
+
+/* Logout sits in the user menu and looks like the link above it. */
+nav form.logout { margin: 0; }
+nav form.logout button {
+  width: calc(100% + var(--pico-form-element-spacing-horizontal) * 2);
+  margin: calc(var(--pico-form-element-spacing-vertical) * -.5) calc(var(--pico-form-element-spacing-horizontal) * -1);
+  padding: calc(var(--pico-form-element-spacing-vertical) * .5) var(--pico-form-element-spacing-horizontal);
+  border: none; border-radius: 0; background: none; color: var(--pico-dropdown-color);
+  font-size: inherit; text-align: start; box-shadow: none;
+}
+nav form.logout button:is(:hover, :focus-visible) { background-color: var(--pico-dropdown-hover-background-color); }
+
+/* Long breadcrumbs wrap instead of running off the screen; a full-width
+   item leaves room for Pico's divider, which sits behind it. */
+nav[aria-label="breadcrumb"] ul { flex-wrap: wrap; }
+nav[aria-label="breadcrumb"] ul li:not(:last-child) { max-width: calc(100% - 1.5rem); }
+
+/* Tablets: the sections don't fit next to the brand and the user menu, so
+   they wrap below. */
+@media (min-width: 576px) and (max-width: 1023.98px) {
+  body > header nav { flex-wrap: wrap; }
+  body > header nav ul.sections {
+    order: 1; flex: 1 0 100%;
+    margin-left: calc(var(--pico-nav-element-spacing-horizontal) * -1);
+  }
+}
+/* Phones: the direct sections and the dropdowns show only their icons, so
+   the bar stays one row; the labels remain for screen readers. */
+@media (max-width: 575.98px) {
+  body > header nav {
+    --pico-nav-element-spacing-horizontal: .35rem;
+    --pico-nav-link-spacing-horizontal: .35rem;
+  }
+  body > header nav :is(ul.sections > li > a, summary) .label {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  body > header .icon { width: 1.35em; height: 1.35em; }
+  /* Without a label, a bar under the icon marks the current section. */
+  body > header nav :is(ul.sections > li > a[aria-current="page"], summary.current) {
+    box-shadow: inset 0 -2px 0 currentColor; border-radius: 0;
+  }
+}
+@media (max-width: 575.98px) {
+  nav[aria-label="breadcrumb"] { --pico-nav-element-spacing-vertical: .25rem; }
+}
+
+/* Phones: lists become cards. Each row is a block, its first cell the
+   title; the other cells flow below, labeled by their data-label (the
+   column head), and row actions move to the right. Form tables
+   (value-rows) keep their columns. */
+@media (max-width: 575.98px) {
+  .overflow-auto > table:not(.value-rows),
+  .overflow-auto > table:not(.value-rows) > tbody { display: block; }
+  .overflow-auto > table:not(.value-rows) > thead { display: none; }
+  .overflow-auto > table:not(.value-rows) tr {
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: .25rem 1.25rem;
+    padding: .75rem 0; border-bottom: var(--pico-border-width) solid var(--pico-table-border-color);
+  }
+  .overflow-auto > table:not(.value-rows) td {
+    display: block; padding: 0; border: 0; background: transparent;
+  }
+  .overflow-auto > table:not(.value-rows) td:first-child { flex: 1 0 100%; }
+  .overflow-auto > table:not(.value-rows) tr.flagged { padding-left: .75rem; box-shadow: inset 3px 0 0 var(--pico-del-color); }
+  .overflow-auto > table:not(.value-rows) tr.flagged > td:first-child { box-shadow: none; }
+  .overflow-auto > table:not(.value-rows) td[data-label]::before {
+    content: attr(data-label); display: block; font-size: .75em; color: var(--pico-muted-color);
+  }
+  .overflow-auto > table:not(.value-rows) td.row-action { width: auto; margin-left: auto; }
+  .overflow-auto > table:not(.value-rows) td.row-action + td.row-action { margin-left: 0; }
+}
+
+/* Start page: a card per bike with odometer, alerts, the last maintenance
+   and the most worn component. */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: var(--pico-spacing); margin-bottom: var(--pico-spacing); }
+.cards > article { display: flex; flex-direction: column; margin: 0; }
+.bike-card > header h2 { --pico-font-size: 1.25rem; margin: 0; }
+.bike-card a:not([role="button"]) { text-decoration: none; }
+.bike-card a:not([role="button"]):hover { text-decoration: underline; }
+.bike-card > footer { margin-top: auto; }
+.bike-card > footer [role="button"] { width: 100%; }
+.bike-card .figure { font-size: 1.75rem; font-weight: 700; font-variant-numeric: tabular-nums; margin-bottom: .5rem; }
+ul.card-alerts { padding: 0; }
+ul.card-alerts li { list-style: none; }
+ul.card-alerts a { color: var(--pico-del-color); }
+
+/* Details stacked: small muted terms above their values, for narrow boxes. */
+dl.stacked { display: block; }
+dl.stacked dt { font-size: .75em; font-weight: 400; color: var(--pico-muted-color); }
+dl.stacked dd { margin-bottom: .75rem; }
+dl.stacked dd:last-child { margin-bottom: 0; }
+
+/* Open maintenance: the status with its progress bar stays at the top
+   while working through the steps. */
+#maintenance-status {
+  position: sticky; top: 0; z-index: 1; background: var(--pico-background-color);
+  padding-top: .5rem; margin-top: -.5rem;
+}
+#maintenance-status p { margin-bottom: .25rem; }
+
+/* The whole head of a step card toggles its checkbox. */
+ol.steps article > header:has(> label) { padding: 0; }
+ol.steps article > header > label {
+  margin: 0; cursor: pointer;
+  padding: calc(var(--pico-block-spacing-vertical) * .66) var(--pico-block-spacing-horizontal);
+}
+/* Done steps step back: a green mark, the body dimmed. */
+ol.steps article:has(> header :checked) { border-left: 3px solid var(--pico-ins-color); }
+ol.steps article:has(> header :checked) > :not(header) { opacity: .6; }
+
+/* The note of a step is usually empty, so it starts collapsed. */
+details.step-note { margin-bottom: 0; }
+details.step-note > summary { font-size: .875em; color: var(--pico-muted-color); }
+details.step-note > input { margin: .5rem 0 0; }
+
+/* Key figures of a bike: label above a big number, in a row of tiles that
+   wraps to two columns on phones. */
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--pico-spacing);
+  margin-bottom: var(--pico-spacing);
+}
+.stats > div {
+  padding: .75rem 1rem; border-radius: var(--pico-border-radius);
+  background: var(--pico-card-sectioning-background-color);
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+}
+.stats small { display: block; color: var(--pico-muted-color); }
+.stats strong { font-size: 1.375rem; font-variant-numeric: tabular-nums; }
+.stats a { color: inherit; text-decoration: none; }
+.stats a:hover { text-decoration: underline; }
+.stats > .alert { border-color: var(--pico-del-color); }
+.stats > .alert strong { color: var(--pico-del-color); }
+@media (max-width: 575.98px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+}
+
+/* Details of a bike, collapsed below the figures. */
+details.bike-facts > summary { color: var(--pico-muted-color); }
+details.bike-facts > dl { margin-bottom: 0; }
+
+/* Components at or near their limit, each with its wear bar. */
+ul.wear-list { padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: .75rem var(--pico-spacing); }
+ul.wear-list li { list-style: none; margin: 0; padding-left: .75rem; border-left: 3px solid var(--pico-muted-border-color); }
+ul.wear-list li.flagged { border-left-color: var(--pico-del-color); }
+ul.wear-list a { text-decoration: none; }
+
+/* Filters above a list: selects in a row that wraps on phones. */
+form.filter { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: var(--pico-spacing); }
+form.filter select { flex: 1 1 12rem; width: auto; margin: 0; }
+form.filter button { width: auto; margin: 0; }
+
+/* Photos and documents: a grid of previews with name and actions. */
+ul.attachments { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: var(--pico-spacing); padding: 0; }
+ul.attachments > li { list-style: none; display: flex; flex-direction: column; gap: .25rem; margin: 0; }
+ul.attachments .preview { display: block; aspect-ratio: 4 / 3; border-radius: var(--pico-border-radius); overflow: hidden; background: var(--pico-card-sectioning-background-color); }
+ul.attachments .preview img, ul.attachments .preview .doc { width: 100%; height: 100%; object-fit: cover; }
+ul.attachments .name { overflow-wrap: anywhere; }
+ul.attachments .badge { align-self: flex-start; }
+ul.attachments .row-action { display: flex; flex-wrap: wrap; gap: .25rem; }
+ul.attachments .row-action form { margin: 0; }
+ul.attachments .row-action [role="button"], ul.attachments .row-action button { padding: .2rem .6rem; font-size: .875em; width: auto; margin: 0; }
+.doc { display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--pico-muted-color); }
+ul.attachment-choices { padding: 0; }
+ul.attachment-choices > li { list-style: none; }
+ul.attachment-choices label { display: flex; align-items: center; gap: .75rem; }
+ul.attachment-choices img, ul.attachment-choices .doc { width: 4.5rem; height: 3.5rem; flex: none; object-fit: cover; border-radius: var(--pico-border-radius); background: var(--pico-card-sectioning-background-color); }
+img.attachment-large { max-height: 24rem; width: auto; border-radius: var(--pico-border-radius); }
+
+/* The bike's photo: on its page below the title, on its card full width
+   at the top. Both use the 4:3 of the attachment previews, so the photo is
+   cut the same way everywhere; the page limits its width, not its height. */
+.bike-photo { display: block; max-width: 30rem; margin-bottom: var(--pico-spacing); }
+.bike-photo img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--pico-border-radius); }
+.bike-card > .card-photo { display: block; margin: calc(var(--pico-block-spacing-vertical) * -1) calc(var(--pico-block-spacing-horizontal) * -1) 0; }
+.bike-card > .card-photo img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--pico-border-radius) var(--pico-border-radius) 0 0; }
+.bike-card > .card-photo + header { margin-top: 0; }
+
+/* Autosave of a maintenance failed (autosave.js). */
+#maintenance-status .save-error { color: var(--pico-del-color); font-weight: 600; }
+
+/* Open maintenance on the bike page. */
+article.open-maintenance { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between; border-left: 4px solid var(--app-warn); }
+article.open-maintenance p { margin: 0; }
+
+/* Follow-ups below a maintenance step: the ones added as links, the
+   offered ones as compact buttons (filled when a measurement says one is
+   needed). The hidden first button keeps Enter in a field saving. */
+.follow-ups { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .75rem; margin-top: var(--pico-spacing); }
+.follow-ups button { width: auto; margin: 0; padding: .2rem .6rem; font-size: .875em; }
+.default-submit { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; border: 0; }
+.open-work { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; }
+.open-work form, form.open-work { margin: 0; }
+.open-work [role="button"], .open-work button { width: auto; margin: 0; padding: .2rem .6rem; font-size: .875em; }
+
+/* Removing a follow-up or a step added later: compact, at the end of it. */
+.step-remove { margin-top: .5rem; text-align: right; }
+.step-remove button { width: auto; margin: 0; padding: .2rem .6rem; font-size: .875em; }

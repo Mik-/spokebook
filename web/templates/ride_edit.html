@@ -1,0 +1,33 @@
+{{define "title"}}{{t "rides.edit.title"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/rides">{{t "rides.title"}}</a></li><li>{{date .Ride.RiddenOn}}</li></ul></nav>
+<h1>{{.Ride.Name}}</h1>
+{{template "error" .}}
+{{if .Ride.Discarded}}<p class="retired">{{t "rides.edit.discarded"}}</p>{{end}}
+<dl>
+  <dt>{{t "rides.edit.date"}}</dt><dd>{{date .Ride.RiddenOn}}</dd>
+  <dt>{{t "rides.col.distance"}}</dt><dd>{{km .Ride.DistanceM}}</dd>
+  <dt>{{t "rides.edit.source"}}</dt><dd>{{t (print "rides.source." .Ride.Source)}}</dd>
+  {{with .Gear.ID}}<dt>{{t "rides.gear.col.source"}}</dt><dd><a href="/ride-gears/{{.}}/edit">{{gearName $.Gear.GearKey $.Gear.Name}}</a></dd>{{end}}
+</dl>
+<form method="post" action="/rides/{{.Ride.ID}}">
+  <label>{{t "rides.col.bike"}}
+    <select name="bike">
+      <option value="">{{t "rides.unassigned"}}</option>
+      {{range .Bikes}}<option value="{{.ID}}"{{if eq .ID ($.Form.Get "bike")}} selected{{end}}>{{.Name}}</option>{{end}}
+    </select>
+    <small>{{t "rides.edit.bike_hint"}}</small>
+  </label>
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+<div class="actions end">
+  {{if .Ride.Discarded}}
+  <form method="post" action="/rides/{{.Ride.ID}}/restore"><button type="submit" class="outline">{{t "rides.restore"}}</button></form>
+  {{else}}
+  <form method="post" action="/rides/{{.Ride.ID}}/discard"><button type="submit" class="outline danger">{{t "rides.discard"}}</button></form>
+  {{end}}
+  <a href="/rides/{{.Ride.ID}}/delete" role="button" class="outline danger">{{t "rides.delete"}}</a>
+</div>
+<p><small>{{t "rides.delete_hint"}}</small></p>
+{{end}}

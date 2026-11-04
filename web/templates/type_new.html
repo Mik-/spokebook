@@ -1,0 +1,11 @@
+{{define "title"}}{{t "types.new"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/components">{{t "components.title"}}</a></li><li><a href="/component-types">{{t "types.title"}}</a></li><li>{{t "types.new"}}</li></ul></nav>
+<h1>{{t "types.new"}}</h1>
+{{template "error" .}}
+<form method="post" action="/component-types">
+  <label>{{t "types.field.name"}}<span class="req" aria-hidden="true">*</span> <input name="name" value="{{.Form.Get "name"}}" required autofocus></label>
+  <button type="submit">{{t "types.create"}}</button>
+</form>
+{{end}}

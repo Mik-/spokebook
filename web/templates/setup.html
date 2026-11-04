@@ -1,0 +1,22 @@
+{{define "title"}}{{t "auth.setup.title"}}{{end}}
+
+{{define "content"}}
+<article class="auth">
+  <h1>{{t "auth.setup.title"}}</h1>
+  <p>{{t "auth.setup.intro"}}</p>
+  {{template "error" .}}
+  <form method="post" action="/setup">
+    {{if .Form.Get "token"}}
+    <input type="hidden" name="token" value="{{.Form.Get "token"}}">
+    {{else}}
+    <label>{{t "auth.field.setup_token"}}<span class="req" aria-hidden="true">*</span> <input name="token" autocomplete="off" required>
+      <small>{{t "auth.setup.token_hint"}}</small></label>
+    {{end}}
+    <label>{{t "auth.field.name"}}<span class="req" aria-hidden="true">*</span> <input name="name" autocomplete="username" maxlength="64" value="{{.Form.Get "name"}}" required autofocus></label>
+    <label>{{t "auth.field.password"}}<span class="req" aria-hidden="true">*</span> <input type="password" name="password" autocomplete="new-password" minlength="{{.MinPassword}}" required>
+      <small>{{t "auth.password.hint" .MinPassword}}</small></label>
+    <label>{{t "auth.field.password_confirm"}}<span class="req" aria-hidden="true">*</span> <input type="password" name="password_confirm" autocomplete="new-password" minlength="{{.MinPassword}}" required></label>
+    <button type="submit">{{t "auth.setup.submit"}}</button>
+  </form>
+</article>
+{{end}}

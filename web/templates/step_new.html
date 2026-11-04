@@ -1,0 +1,11 @@
+{{define "title"}}{{t "step.new"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/steps">{{t "steps.title"}}</a></li><li>{{t "step.new"}}</li></ul></nav>
+<h1>{{t "step.new"}}</h1>
+{{template "error" .}}
+<form method="post" action="/steps">
+  {{template "step-fields" .}}
+  <button type="submit">{{t "step.create"}}</button>
+</form>
+{{end}}

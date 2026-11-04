@@ -1,0 +1,21 @@
+{{define "title"}}{{t "auth.login.title"}}{{end}}
+
+{{define "scripts"}}<script src="/static/passkey.js" defer></script>{{end}}
+
+{{define "content"}}
+<article class="auth">
+  <h1>{{t "auth.login.title"}}</h1>
+  {{template "error" .}}
+  <p role="alert" data-passkey-error hidden></p>
+  <form method="post" action="/login">
+    <input type="hidden" name="next" value="{{.Next}}">
+    <label>{{t "auth.field.name"}}<span class="req" aria-hidden="true">*</span> <input name="name" autocomplete="username webauthn" value="{{.Form.Get "name"}}" required autofocus></label>
+    <label>{{t "auth.field.password"}}<span class="req" aria-hidden="true">*</span> <input type="password" name="password" autocomplete="current-password" required></label>
+    <button type="submit">{{t "auth.login.submit"}}</button>
+  </form>
+  <div data-passkey-supported hidden>
+    <p class="divider">{{t "auth.login.or"}}</p>
+    <button type="button" class="outline" data-passkey-login data-begin="/login/passkey/begin" data-finish="/login/passkey/finish?next={{.Next | urlquery}}" data-error="{{t "auth.error.passkey"}}">{{t "auth.login.passkey"}}</button>
+  </div>
+</article>
+{{end}}

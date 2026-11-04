@@ -1,0 +1,14 @@
+{{define "title"}}{{t "confirm.title"}}{{end}}
+
+{{define "content"}}
+<article>
+  <header><strong>{{t "confirm.title"}}</strong></header>
+  <p>{{.Message}}</p>
+  <footer>
+    <form method="post" action="{{.Action}}" class="actions">
+      <a href="{{.Cancel}}" role="button" class="outline secondary">{{t "action.cancel"}}</a>
+      <button type="submit" class="danger">{{or .Submit (t "action.delete")}}</button>
+    </form>
+  </footer>
+</article>
+{{end}}

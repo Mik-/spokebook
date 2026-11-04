@@ -1,0 +1,24 @@
+{{define "title"}}{{t "attachments.link.title"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul>{{range .Target.Crumbs}}<li><a href="{{.Path}}">{{.Name}}</a></li>{{end}}<li>{{t "attachments.link.title"}}</li></ul></nav>
+<h1>{{t "attachments.link.title"}}</h1>
+{{template "error" .}}
+{{if .Candidates}}
+<p>{{t "attachments.link.intro" .Target.Name}}</p>
+<form method="post" action="{{.Target.Path}}/attachments/link">
+  <ul class="attachment-choices">
+    {{range .Candidates}}
+    <li><label>
+      <input type="checkbox" name="attachment" value="{{.ID}}"{{if has (index $.Form "attachment") .ID}} checked{{end}}>
+      {{template "attachment-preview" .}}
+      <span><strong>{{.Name}}</strong><br><small>{{.LinkedTo}} · {{date .CreatedAt}}</small></span>
+    </label></li>
+    {{end}}
+  </ul>
+  <button type="submit">{{t "attachments.link.submit"}}</button>
+</form>
+{{else}}
+<p>{{t "attachments.link.empty"}}</p>
+{{end}}
+{{end}}

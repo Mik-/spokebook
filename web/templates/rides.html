@@ -1,0 +1,70 @@
+{{define "title"}}{{t "rides.title"}}{{end}}
+
+{{define "scripts"}}{{template "htmx"}}{{end}}
+
+{{define "content"}}
+<div class="page-head">
+  <h1>{{t "rides.title"}}</h1>
+  <div class="actions">
+    <a href="/rides/garmin" role="button" class="outline">{{t "rides.garmin"}}</a>
+    <a href="/ride-gears" role="button" class="outline">{{t "rides.gears"}}</a>
+    <a href="/rides/import" role="button">+ {{t "rides.import"}}</a>
+  </div>
+</div>
+{{with .Result}}<p role="status">{{tn "rides.result.imported" .Imported}}{{if .Skipped}} {{tn "rides.result.skipped" .Skipped}}{{end}}{{if .Unassigned}} {{tn "rides.result.unassigned" .Unassigned}}{{end}}</p>{{end}}
+{{if .Any}}
+<form method="get" action="/rides" class="filter" hx-get="/rides" hx-trigger="change, submit"
+      hx-target="#ride-list" hx-select="#ride-list" hx-swap="outerHTML" hx-push-url="true">
+  <select name="bike" aria-label="{{t "rides.col.bike"}}">
+    <option value="">{{t "rides.filter.all_bikes"}}</option>
+    {{range .Bikes}}<option value="{{.ID}}"{{if eq .ID $.Filter.Bike}} selected{{end}}>{{.Name}}</option>{{end}}
+    <option value="none"{{if eq "none" .Filter.Bike}} selected{{end}}>{{t "rides.unassigned"}}</option>
+    <option value="discarded"{{if eq "discarded" .Filter.Bike}} selected{{end}}>{{t "rides.filter.discarded"}}</option>
+  </select>
+  <select name="year" aria-label="{{t "rides.filter.year"}}">
+    <option value="all"{{if not .Filter.Year}} selected{{end}}>{{t "rides.filter.all_years"}}</option>
+    {{range .Years}}<option value="{{.}}"{{if eq . $.Filter.Year}} selected{{end}}>{{.}}</option>{{end}}
+  </select>
+  {{if .Gears}}
+  <select name="gear" aria-label="{{t "rides.gear.col.source"}}">
+    <option value="">{{t "rides.filter.all_gears"}}</option>
+    {{range .Gears}}<option value="{{.ID}}"{{if eq .ID $.Filter.Gear}} selected{{end}}>{{gearName .GearKey .Name}}</option>{{end}}
+  </select>
+  {{end}}
+  <button type="submit" class="outline">{{t "rides.filter.apply"}}</button>
+</form>
+{{end}}
+<div id="ride-list">
+{{if .Rides}}
+<p><small>{{tn "rides.count" (len .Rides)}} · {{km .TotalM}}{{if .Filter.Any}} · <a href="/rides?year=all">{{t "rides.filter.reset"}}</a>{{end}}</small></p>
+<div class="overflow-auto">
+<table>
+  <thead>
+    <tr><th>{{t "rides.col.ride"}}</th><th>{{t "rides.col.bike"}}</th><th>{{t "rides.col.distance"}}</th><th></th></tr>
+  </thead>
+  <tbody>
+    {{range .Rides}}
+    <tr>
+      <td><a href="/rides/{{.ID}}/edit">{{date .RiddenOn}}</a>{{if .Discarded}} <span class="badge">{{t "rides.discarded"}}</span>{{end}}<br><small>{{.Name}} · {{t (print "rides.source." .Source)}}</small></td>
+      <td data-label="{{t "rides.col.bike"}}">{{if .BikeID}}<a href="/bikes/{{.BikeID}}">{{.BikeName}}</a>{{else}}<span class="badge open">{{t "rides.unassigned"}}</span>{{end}}</td>
+      <td data-label="{{t "rides.col.distance"}}">{{km .DistanceM}}</td>
+      <td class="row-action"><a href="/rides/{{.ID}}/edit" role="button" class="outline">{{t "action.edit"}}</a></td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+</div>
+{{if .Filter.Any}}
+<div class="actions end">
+  {{if ne .Filter.Bike "discarded"}}<a href="{{.DiscardURL}}" role="button" class="outline">{{t "rides.bulk.discard"}}</a>{{end}}
+  <a href="{{.DeleteURL}}" role="button" class="outline danger">{{t "rides.bulk.delete"}}</a>
+</div>
+<p><small>{{t "rides.bulk.hint"}}</small></p>
+{{end}}
+{{else if .Filter.Any}}
+<p>{{t "rides.filter.empty"}} <a href="/rides?year=all">{{t "rides.filter.reset"}}</a></p>
+{{else}}
+<p>{{t "rides.empty"}}</p>
+{{end}}
+</div>
+{{end}}

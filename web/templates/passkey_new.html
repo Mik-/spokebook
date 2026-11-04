@@ -1,0 +1,15 @@
+{{define "title"}}{{t "account.passkey.new"}}{{end}}
+
+{{define "scripts"}}<script src="/static/passkey.js" defer></script>{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul><li><a href="/account">{{t "account.title"}}</a></li><li>{{t "account.passkey.new"}}</li></ul></nav>
+<h1>{{t "account.passkey.new"}}</h1>
+<p data-passkey-unsupported>{{t "account.passkey.unsupported"}}</p>
+<p role="alert" data-passkey-error hidden></p>
+<form method="post" data-passkey-register data-begin="/account/passkeys/begin" data-finish="/account/passkeys/finish" data-error="{{t "auth.error.passkey"}}" hidden>
+  <label>{{t "account.passkey.field.name"}}<span class="req" aria-hidden="true">*</span> <input name="name" maxlength="64" required autofocus>
+    <small>{{t "account.passkey.name_hint"}}</small></label>
+  <button type="submit">{{t "account.passkey.create"}}</button>
+</form>
+{{end}}

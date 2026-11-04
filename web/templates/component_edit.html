@@ -1,0 +1,12 @@
+{{define "title"}}{{t "component.edit"}}{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb"><ul>{{template "component-crumbs" .From}}<li><a href="/components/{{.C.ID}}{{.FromQuery}}">{{t "action.back"}}</a></li><li>{{t "action.edit"}}</li></ul></nav>
+<h1>{{t "component.edit"}}</h1>
+{{template "error" .}}
+<form method="post" action="/components/{{.C.ID}}{{.FromQuery}}">
+  {{template "component-fields" .}}
+  <button type="submit">{{t "action.save"}}</button>
+</form>
+<div class="actions end"><a href="/components/{{.C.ID}}/delete{{.FromQuery}}" role="button" class="outline danger">{{t "component.delete"}}</a></div>
+{{end}}

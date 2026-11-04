@@ -1,0 +1,76 @@
+{{define "title"}}{{.Step.Title}}{{end}}
+
+{{define "content"}}
+{{with .Step}}
+<nav aria-label="breadcrumb"><ul><li><a href="/steps?step={{.ID}}#step-{{.ID}}">{{t "steps.title"}}</a></li><li>{{.Title}}</li></ul></nav>
+<div class="page-head">
+  <h1>{{.Title}}</h1>
+  <div class="actions"><a href="/steps/{{.ID}}/edit" role="button" class="outline">{{t "action.edit"}}</a></div>
+</div>
+
+<section class="step-section">
+  <h2>{{t "step.section.what"}}</h2>
+  <dl>
+    <dt>{{t "step.field.action"}}</dt>
+    <dd>{{with .Action}}{{t (print "step.action." .)}}{{else}}–{{end}}</dd>
+    {{with .Instructions}}<dt>{{t "step.field.instructions"}}</dt><dd class="multiline">{{.}}</dd>{{end}}
+  </dl>
+</section>
+
+<section class="step-section">
+  <h2>{{t "step.section.where"}}</h2>
+  <dl>
+    <dt>{{t "step.field.phase"}}</dt>
+    <dd>{{t (print "phase." .Phase)}}</dd>
+    <dt>{{t "step.field.assembly"}}</dt>
+    <dd>{{with .Assembly}}{{t (print "assembly." .)}}{{else}}–{{end}}</dd>
+  </dl>
+</section>
+
+<section class="step-section">
+  <h2>{{t "step.section.when"}}</h2>
+  <dl>
+    <dt>{{t "step.field.levels"}}</dt>
+    <dd>{{template "level-ladder" .Levels}}
+      {{if .Levels}}<small>{{range $i, $l := .Levels}}{{if $i}}, {{end}}{{t (print "level." $l)}}{{end}}</small>{{end}}
+    </dd>
+    <dt>{{t "step.field.interval"}}</dt>
+    <dd>{{if .Interval.IsZero}}–{{else}}{{template "interval" .Interval}}{{end}}</dd>
+  </dl>
+</section>
+
+<section class="step-section">
+  <h2>{{t "step.section.bikes"}}</h2>
+  <dl>
+    <dt>{{t "step.field.module"}}</dt>
+    <dd>{{with .Module}}{{t (print "feature." .)}}{{else}}{{t "step.bikes.all"}}{{end}}</dd>
+    {{with .ReplacesTitle}}<dt>{{t "step.label.replaces"}}</dt><dd><a href="/steps/{{$.Step.Replaces}}">{{.}}</a></dd>{{end}}
+    {{with .ReplacedBy}}
+    <dt>{{t "step.label.replaced_by"}}</dt>
+    <dd>{{range $i, $r := .}}{{if $i}}, {{end}}<a href="/steps/{{$r.ID}}">{{$r.Title}}</a> <small>({{t (print "feature." $r.Module)}})</small>{{end}}</dd>
+    {{end}}
+    {{with .DroppedBy}}<dt>{{t "step.label.dropped_by"}}</dt><dd>{{.}}</dd>{{end}}
+  </dl>
+  {{range .Hints}}<p class="hint"><small>{{t (print "hint." .)}}</small></p>{{end}}
+</section>
+
+{{if or .Findings .Always .FollowedBy}}
+<section class="step-section">
+  <h2>{{t "step.section.follow_ups"}}</h2>
+  <dl>
+    {{with .Findings}}<dt>{{t "follow_up.kind.finding"}}</dt><dd>{{range $i, $f := .}}{{if $i}}, {{end}}<a href="/steps/{{$f.ID}}">{{$f.Title}}</a>{{end}}</dd>{{end}}
+    {{with .Always}}<dt>{{t "follow_up.kind.always"}}</dt><dd>{{range $i, $f := .}}{{if $i}}, {{end}}<a href="/steps/{{$f.ID}}">{{$f.Title}}</a>{{end}}</dd>{{end}}
+    {{with .FollowedBy}}<dt>{{t "step.label.follows"}}</dt><dd>{{range $i, $f := .}}{{if $i}}, {{end}}<a href="/steps/{{$f.Step.ID}}">{{$f.Step.Title}}</a> <small>({{t (print "follow_up.kind." $f.Kind)}})</small>{{end}}</dd>{{end}}
+  </dl>
+</section>
+{{end}}
+
+{{if or .Values .TypeNames}}
+<section class="step-section">
+  <h2>{{t "value.title"}}</h2>
+  {{with .Values}}{{template "value-list" .}}{{end}}
+  {{with .TypeNames}}<p><small>{{t "step.component_values" .}}{{with $.Step.ValueKinds}} ({{range $i, $k := .}}{{if $i}}, {{end}}{{t (print "value.kind." $k)}}{{end}}){{end}}</small></p>{{end}}
+</section>
+{{end}}
+{{end}}
+{{end}}

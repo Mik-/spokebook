@@ -1,0 +1,362 @@
+{{/* htmx with a configuration that fits the strict CSP (no inline styles,
+     no eval). Validation errors (422) are swapped in like a success. */}}
+{{define "htmx"}}
+<meta name="htmx-config" content='{"includeIndicatorStyles":false,"allowEval":false,"allowScriptTags":false,"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"422","swap":true},{"code":"[45]..","swap":false,"error":true}]}'>
+<script src="/static/vendor/htmx-2.0.4.min.js" defer></script>
+{{end}}
+
+{{/* Display name of a component: "Manufacturer Model", or its type. */}}
+{{define "component-name"}}{{if or .Manufacturer .Model}}{{.Manufacturer}} {{.Model}}{{else}}{{.TypeName}}{{end}}{{end}}
+
+{{/* First breadcrumbs of a component page: the component list of the bike it
+     was opened from (a *store.Bike), or the list of all components. */}}
+{{define "component-crumbs"}}{{if .}}<li><a href="/">{{t "bikes.title"}}</a></li><li><a href="/bikes/{{.ID}}">{{.Name}}</a></li><li><a href="/bikes/{{.ID}}/components">{{t "bike.components"}}</a></li>{{else}}<li><a href="/components">{{t "components.title"}}</a></li>{{end}}{{end}}
+
+{{/* Mileage of a componentView with limit and alerts. */}}
+{{define "component-wear"}}{{km .Wear.MileageM}}{{if ge .Wear.Percent 0}} · {{t "component.wear.percent" .Wear.Percent}}{{end}}{{if .Wear.OverDistance}} <span class="badge danger">{{t "component.wear.over_distance"}}</span>{{end}}{{if .Wear.Overdue}} <span class="badge danger">{{t "component.wear.overdue"}}</span>{{end}}{{end}}
+
+{{/* Bar of the used distance limit of a componentView; amber from 80 %,
+     red at the limit. The text of component-wear carries the number. */}}
+{{define "wear-bar"}}{{if ge .Wear.Percent 0}}<progress class="wear{{if .Wear.OverDistance}} over{{else if ge .Wear.Percent 80}} warn{{end}}" value="{{.Wear.Percent}}" max="100" aria-hidden="true"></progress>{{end}}{{end}}
+
+{{/* The wheel of the brand; follows the text color. */}}
+{{define "logo"}}<svg class="logo" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="16" cy="16" r="13"/><circle cx="16" cy="16" r="2.5" fill="currentColor"/><path d="M16 3.5v10M16 18.5v10M5.2 9.8l8.6 5M18.2 17.2l8.6 5M5.2 22.2l8.6-5M18.2 14.8l8.6-5"/></svg>{{end}}
+
+{{/* Retirement banner; expects a bike or component as dot. */}}
+{{define "retired-banner"}}{{with .RetiredAt}}<p class="retired">{{t "retire.banner" (date .) (t (print "retire.reason." $.RetireReason))}}</p>{{end}}{{end}}
+
+{{/* Validation error of a form page. */}}
+{{define "error"}}{{with .Error}}<p role="alert">{{.}}</p>{{end}}{{end}}
+
+{{/* Fields of the component form; expects .Form, .Types, .Manufacturers and .Dealers. */}}
+{{define "component-fields"}}
+<label>{{t "component.field.type"}}<span class="req" aria-hidden="true">*</span>
+  <select name="type" required>
+    {{range .Types}}<option value="{{.ID}}"{{if eq .ID ($.Form.Get "type")}} selected{{end}}>{{.Name}}</option>{{end}}
+  </select>
+  <small><a href="/component-types">{{t "types.manage"}}</a></small>
+</label>
+<div class="grid">
+  <label>{{t "component.field.manufacturer"}} <input name="manufacturer" list="manufacturers" autocomplete="off" value="{{.Form.Get "manufacturer"}}"></label>
+  <label>{{t "component.field.model"}} <input name="model" value="{{.Form.Get "model"}}"></label>
+</div>
+<datalist id="manufacturers">{{range .Manufacturers}}<option value="{{.}}">{{end}}</datalist>
+<label>{{t "component.field.part_number"}} <input name="part_number" value="{{.Form.Get "part_number"}}"></label>
+<div class="grid">
+  <label>{{t "component.field.purchased_at"}} <input type="date" name="purchased_at" value="{{.Form.Get "purchased_at"}}"></label>
+  <label>{{t "component.field.dealer"}} <input name="dealer" list="dealers" autocomplete="off" value="{{.Form.Get "dealer"}}"></label>
+</div>
+<datalist id="dealers">{{range .Dealers}}<option value="{{.}}">{{end}}</datalist>
+<div class="grid">
+  <label>{{t "component.field.price"}} <input type="number" name="price" min="0" step="0.01" inputmode="decimal" value="{{.Form.Get "price"}}"></label>
+  <label>{{t "component.field.currency"}} <input name="currency" maxlength="3" value="{{or (.Form.Get "currency") "EUR"}}"></label>
+</div>
+<div class="grid">
+  <label>{{t "component.field.max_km"}} <input type="number" name="max_km" min="0.1" step="0.1" inputmode="decimal" value="{{.Form.Get "max_km"}}"></label>
+  <label>{{t "component.field.replace_by"}} <input type="date" name="replace_by" value="{{.Form.Get "replace_by"}}"></label>
+</div>
+<label>{{t "component.field.url"}} <input type="url" name="url" placeholder="https://…" value="{{.Form.Get "url"}}"></label>
+<label>{{t "component.field.notes"}} <textarea name="notes">{{.Form.Get "notes"}}</textarea></label>
+{{template "value-fields" .}}
+{{end}}
+
+{{/* Rows for values (label, from, to, unit); expects .Form, .ValueLabels and .ValueUnits.
+    .HideKind leaves out the kind, .ValueHint replaces the hint below. */}}
+{{define "value-fields"}}
+<fieldset>
+  <legend>{{t "value.title"}}</legend>
+  <div class="overflow-auto">
+  <table class="value-rows">
+    <thead><tr><th>{{t "value.field.label"}}</th>{{if not $.HideKind}}<th>{{t "value.field.kind"}}</th>{{end}}<th>{{t "value.field.from"}}</th><th>{{t "value.field.to"}}</th><th>{{t "value.field.unit"}}</th><th>{{t "value.field.hint"}}</th></tr></thead>
+    <tbody>
+      {{range valueRows .Form}}
+      {{$kind := .Kind}}
+      <tr>
+        <td><input type="hidden" name="value_key" value="{{.Key}}"><input name="value_label" list="value-labels" autocomplete="off" aria-label="{{t "value.field.label"}}" value="{{.Label}}"></td>
+        {{if not $.HideKind}}<td><select name="value_kind" aria-label="{{t "value.field.kind"}}">
+          <option value="">{{t "value.kind.auto"}}</option>
+          {{range valueKinds}}<option value="{{.}}"{{if eq . $kind}} selected{{end}}>{{t (print "value.kind." .)}}</option>{{end}}
+        </select></td>{{end}}
+        <td><input name="value_from" inputmode="decimal" aria-label="{{t "value.field.from"}}" value="{{.From}}"></td>
+        <td><input name="value_to" inputmode="decimal" aria-label="{{t "value.field.to"}}" value="{{.To}}"></td>
+        <td><input name="value_unit" list="value-units" autocomplete="off" aria-label="{{t "value.field.unit"}}" value="{{.Unit}}"></td>
+        <td><input name="value_hint" aria-label="{{t "value.field.hint"}}" value="{{.Hint}}"></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+  <small>{{t (or $.ValueHint "value.hint")}}</small>
+  <datalist id="value-labels">{{range .ValueLabels}}<option value="{{.}}">{{end}}</datalist>
+  <datalist id="value-units">{{range .ValueUnits}}<option value="{{.}}">{{end}}</datalist>
+</fieldset>
+{{end}}
+
+{{/* Table of values; expects a []store.Value as dot. */}}
+{{define "value-list"}}
+<div class="overflow-auto">
+<table>
+  <thead><tr><th>{{t "value.field.label"}}</th><th>{{t "value.field.kind"}}</th><th>{{t "value.title"}}</th><th>{{t "value.field.hint"}}</th></tr></thead>
+  <tbody>
+    {{range .}}<tr><td>{{.Label}}</td><td data-label="{{t "value.field.kind"}}">{{t (print "value.kind." .Kind)}}</td><td data-label="{{t "value.title"}}">{{value .}}</td><td data-label="{{t "value.field.hint"}}">{{.Hint}}</td></tr>{{end}}
+  </tbody>
+</table>
+</div>
+{{end}}
+
+{{/* Fields of the bike form; expects .Form, .Origins, .Features and .Dealers. */}}
+{{define "bike-fields"}}
+<div class="grid">
+  <label>{{t "bikes.field.name"}}<span class="req" aria-hidden="true">*</span> <input name="name" value="{{.Form.Get "name"}}" required></label>
+  <label>{{t "bikes.field.type"}} <input name="type" value="{{.Form.Get "type"}}" placeholder="{{t "bikes.field.type.placeholder"}}"></label>
+</div>
+<fieldset>
+  <legend>{{t "bike.origin"}}</legend>
+  <label>{{t "bike.field.origin"}}
+    <select name="origin">
+      <option value="">–</option>
+      {{range .Origins}}<option value="{{.}}"{{if eq . ($.Form.Get "origin")}} selected{{end}}>{{t (print "bike.origin." .)}}</option>{{end}}
+    </select>
+  </label>
+  <div class="grid">
+    <label>{{t "component.field.purchased_at"}} <input type="date" name="purchased_at" value="{{.Form.Get "purchased_at"}}"></label>
+    <label>{{t "component.field.dealer"}} <input name="dealer" list="dealers" autocomplete="off" value="{{.Form.Get "dealer"}}"></label>
+  </div>
+  <datalist id="dealers">{{range .Dealers}}<option value="{{.}}">{{end}}</datalist>
+  <div class="grid">
+    <label>{{t "component.field.price"}} <input type="number" name="price" min="0" step="0.01" inputmode="decimal" value="{{.Form.Get "price"}}"></label>
+    <label>{{t "component.field.currency"}} <input name="currency" maxlength="3" value="{{or (.Form.Get "currency") "EUR"}}"></label>
+  </div>
+</fieldset>
+<fieldset>
+  <legend>{{t "bike.in_service"}}</legend>
+  <div class="grid">
+    <label>{{t "bike.field.in_service_at"}} <input type="date" name="in_service_at" value="{{.Form.Get "in_service_at"}}"></label>
+    <label>{{t "bike.field.in_service_km"}} <input type="number" name="in_service_km" min="0" step="0.1" inputmode="decimal" value="{{.Form.Get "in_service_km"}}"></label>
+  </div>
+  <small>{{t "bike.in_service.hint"}}</small>
+</fieldset>
+<fieldset>
+  <legend>{{t "bike.features"}}</legend>
+  {{range .Features}}<label><input type="checkbox" name="feature" value="{{.}}"{{if has (index $.Form "feature") .}} checked{{end}}> {{t (print "feature." .)}}</label>{{end}}
+  <small>{{t "bike.features.hint"}}</small>
+</fieldset>
+<label>{{t "bikes.field.notes"}} <textarea name="notes">{{.Form.Get "notes"}}</textarea></label>
+{{end}}
+
+{{/* Date, bike odometer and position of a mount; expects .Form and .Positions. */}}
+{{define "mount-fields"}}
+<div class="grid">
+  <label>{{t "mount.field.date"}}<span class="req" aria-hidden="true">*</span> <input type="date" name="date" value="{{.Form.Get "date"}}" required></label>
+  <label>{{t "component.field.odometer_km"}} <input type="number" name="km" min="0" step="0.1" inputmode="decimal" value="{{.Form.Get "km"}}"></label>
+  <label>{{t "component.field.position"}}
+    <select name="position">
+      <option value="">–</option>
+      {{range .Positions}}<option value="{{.}}"{{if eq . ($.Form.Get "position")}} selected{{end}}>{{t (print "position." .)}}</option>{{end}}
+    </select>
+  </label>
+</div>
+<small>{{t "component.odometer_hint"}}</small>
+{{end}}
+
+{{/* Confirmation after a warning that a component of the same type is
+     already installed at that position; expects .Form. */}}
+{{define "duplicate-confirm"}}
+{{with .Form.Get "duplicate_of"}}
+<label><input type="checkbox" name="allow_duplicate" value="1"> {{t "duplicate.confirm"}}</label>
+<p><a href="/components/{{.}}/replace">{{t "duplicate.replace"}}</a></p>
+{{end}}
+{{end}}
+
+{{/* Fields of the step form; expects .Form, .Types, .Phases, .Assemblies,
+     .Actions, .Levels, .ValueLabels and .ValueUnits. */}}
+{{define "step-fields"}}
+<fieldset>
+  <legend>{{t "step.section.what"}}</legend>
+  <label>{{t "step.field.title"}}<span class="req" aria-hidden="true">*</span> <input name="title" value="{{.Form.Get "title"}}" required></label>
+  <label>{{t "step.field.action"}}
+    <select name="action">
+      <option value="">–</option>
+      {{range .Actions}}<option value="{{.}}"{{if eq . ($.Form.Get "action")}} selected{{end}}>{{t (print "step.action." .)}}</option>{{end}}
+    </select>
+  </label>
+  <label>{{t "step.field.instructions"}} <textarea name="instructions" rows="4">{{.Form.Get "instructions"}}</textarea></label>
+</fieldset>
+<fieldset>
+  <legend>{{t "step.section.where"}}</legend>
+  <div class="grid">
+    <label>{{t "step.field.phase"}}<span class="req" aria-hidden="true">*</span>
+      <select name="phase" required>
+        <option value="">–</option>
+        {{range .Phases}}<option value="{{.}}"{{if eq . ($.Form.Get "phase")}} selected{{end}}>{{t (print "phase." .)}}</option>{{end}}
+      </select>
+    </label>
+    <label>{{t "step.field.assembly"}}
+      <select name="assembly">
+        <option value="">–</option>
+        {{range .Assemblies}}<option value="{{.}}"{{if eq . ($.Form.Get "assembly")}} selected{{end}}>{{t (print "assembly." .)}}</option>{{end}}
+      </select>
+    </label>
+  </div>
+</fieldset>
+<fieldset>
+  <legend>{{t "step.section.when"}}</legend>
+  <div class="checkbox-grid">
+    {{range .Levels}}<label><input type="checkbox" name="level" value="{{.}}"{{if has (index $.Form "level") .}} checked{{end}}> {{t (print "level." .)}}</label>{{end}}
+  </div>
+  <small>{{t "step.field.levels.hint"}}</small>
+  <div class="grid">
+    <label>{{t "step.field.interval"}}: {{t "interval.months"}} <input type="number" name="interval_months" min="1" max="120" step="1" inputmode="numeric" value="{{.Form.Get "interval_months"}}"></label>
+    <label>{{t "step.field.interval"}}: {{t "interval.km"}} <input type="number" name="interval_km" min="0.1" step="0.1" inputmode="decimal" value="{{.Form.Get "interval_km"}}"></label>
+  </div>
+  <small>{{t "step.field.interval.hint"}}</small>
+</fieldset>
+<fieldset>
+  <legend>{{t "step.section.bikes"}}</legend>
+  <label>{{t "step.field.module"}}
+    <select name="module">
+      <option value="">{{t "step.module.all"}}</option>
+      {{range .Modules}}<option value="{{.}}"{{if eq . ($.Form.Get "module")}} selected{{end}}>{{t (print "feature." .)}}</option>{{end}}
+    </select>
+  </label>
+  <small>{{t "step.field.module.hint"}}</small>
+</fieldset>
+<fieldset>
+  <legend>{{t "step.section.follow_ups"}}</legend>
+  <div class="overflow-auto">
+  <table class="value-rows follow-up-rows">
+    <thead><tr><th>{{t "step.follow_up.step"}}</th><th>{{t "step.follow_up.kind"}}</th></tr></thead>
+    <tbody>
+      {{range followUpRows .Form}}
+      {{$row := .}}
+      <tr>
+        <td><select name="follow_up_step" aria-label="{{t "step.follow_up.step"}}">
+          <option value="">–</option>
+          {{range $.StepOptions}}<optgroup label="{{t (print "phase." .Phase)}}">
+            {{range .Steps}}{{if ne .ID $.Step.ID}}<option value="{{.ID}}"{{if eq .ID $row.Step}} selected{{end}}>{{.Title}}</option>{{end}}{{end}}
+          </optgroup>{{end}}
+        </select></td>
+        <td><select name="follow_up_kind" aria-label="{{t "step.follow_up.kind"}}">
+          {{range followUpKinds}}<option value="{{.}}"{{if eq . $row.Kind}} selected{{end}}>{{t (print "follow_up.kind." .)}}</option>{{end}}
+        </select></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+  <small>{{t "step.field.follow_ups.hint"}}</small>
+</fieldset>
+<fieldset>
+  <legend>{{t "step.field.component_type"}}</legend>
+  <div class="checkbox-grid">
+    {{range .Types}}<label><input type="checkbox" name="component_type" value="{{.ID}}"{{if has (index $.Form "component_type") .ID}} checked{{end}}> {{.Name}}</label>{{end}}
+  </div>
+  <div class="checkbox-grid">
+    {{range stepKinds}}<label><input type="checkbox" name="component_kind" value="{{.}}"{{if has (index $.Form "component_kind") .}} checked{{end}}> {{t (print "value.kind." .)}}</label>{{end}}
+  </div>
+  <small>{{t "step.field.component_type.hint"}}</small>
+</fieldset>
+{{template "value-fields" .}}
+{{end}}
+
+{{/* The levels a step belongs to as four fixed chips (lit = in the level),
+     so steps can be compared by eye; expects the step's levels. */}}
+{{define "level-ladder"}}
+{{- $have := . -}}
+<span class="levels" role="img" aria-label="{{if $have}}{{range $i, $l := $have}}{{if $i}}, {{end}}{{t (print "level." $l)}}{{end}}{{else}}{{t "level.on_demand"}}{{end}}">
+  {{- if $have}}{{range levels}}<span class="lv{{if has $have .}} on{{end}}" aria-hidden="true" title="{{t (print "level." .)}}">{{t (print "level." . ".short")}}</span>{{end}}
+  {{- else}}<span class="lv-demand" aria-hidden="true">{{t "level.on_demand"}}</span>{{end -}}
+</span>
+{{end}}
+
+{{/* An interval as "every 6 months or 1,500 km". */}}
+{{define "interval"}}
+{{- if .Months}}
+  {{- if eq (deref .Months) 1}}{{if .DistanceM}}{{t "interval.every_month_or_km" (km (deref .DistanceM))}}{{else}}{{t "interval.every_month"}}{{end}}
+  {{- else if .DistanceM}}{{t "interval.every_months_or_km" (deref .Months) (km (deref .DistanceM))}}
+  {{- else}}{{t "interval.every_months" (deref .Months)}}{{end}}
+{{- else if .DistanceM}}{{t "interval.every_km" (km (deref .DistanceM))}}{{end}}
+{{- end}}
+
+{{/* Name of a maintenance: its level, else its title (from before the
+     catalog), else a generic name. */}}
+{{define "maintenance-name"}}{{if .Level}}{{t (print "level." .Level)}}{{else if .Title}}{{.Title}}{{else}}{{t "maintenance.title"}}{{end}}{{end}}
+
+{{/* Status of a maintenanceSummary: open or completed, steps done, limits. */}}
+{{define "maintenance-status"}}{{if .Open}}<span class="badge open">{{t "maintenance.open"}}</span>{{else}}<span class="badge done">{{t "maintenance.completed"}}</span>{{end}} {{t "maintenance.steps_done" .Done .Total}}{{if .OutOfLimit}} <span class="badge danger">{{t "maintenance.out_of_limit"}}</span>{{end}}{{end}}
+
+{{/* Values of a maintenance step for one component or the step itself;
+     expects a dict with G (valueGroup), Form and Open. */}}
+{{define "maintenance-values"}}
+{{with .G.Name}}<h4>{{.}}{{with $.G.Position}} ({{t (print "position." .)}}){{end}}</h4>{{end}}
+<div class="overflow-auto">
+<table>
+  <thead><tr><th>{{t "value.field.label"}}</th><th>{{t "maintenance.target"}}</th><th>{{t "maintenance.measured"}}</th></tr></thead>
+  <tbody>
+    {{range .G.Values}}
+    <tr{{if .OutOfLimit}} class="alert"{{end}}>
+      <td>{{.Label}}</td>
+      <td data-label="{{t "maintenance.target"}}">{{value .Value}}{{with .Hint}}<br><small>{{.}}</small>{{end}}</td>
+      <td data-label="{{t "maintenance.measured"}}">{{if not .Measurable}}–{{else if $.Open}}<input name="measured_{{.ID}}" inputmode="decimal" aria-label="{{t "maintenance.measured"}}: {{.Label}}" value="{{$.Form.Get (print "measured_" .ID)}}">{{else}}{{with .Measured}}{{num .}}{{else}}–{{end}}{{end}}{{if .OutOfLimit}} <span class="badge danger">{{t "maintenance.out_of_limit"}}</span>{{end}}</td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+</div>
+{{end}}
+
+{{/* A due.Item: name, status badge, when it is due and since when it counts. */}}
+{{define "due-name"}}{{if .Level}}{{t (print "level." .Level)}}{{else}}{{.Step.Title}}{{end}}{{end}}
+{{define "due-badge"}}{{if .Open}}<span class="badge danger">{{t "due.open"}}</span>{{else if eq .State.String "overdue"}}<span class="badge danger">{{t "due.overdue"}}</span>{{else if eq .State.String "soon"}}<span class="badge open">{{t "due.soon"}}</span>{{end}}{{end}}
+{{define "due-when"}}{{with .Open}}{{t "due.open_since" (date .At)}}{{with .Origin.Title}} ({{t "due.open_from" .}}){{end}}{{else}}{{with .DueAt}}{{if $.Expired}}{{t "due.since_date" (date .)}}{{else}}{{t "due.until_date" (date .)}}{{end}}{{end}}{{if and .DueAt .LeftM}} · {{end}}{{if .LeftM}}{{if gt .OverM 0}}{{t "due.km_over" (km .OverM)}}{{else}}{{t "due.km_left" (km .RemainM)}}{{end}}{{end}}{{end}}{{end}}
+{{define "due-bar"}}{{if not .Open}}<progress class="wear{{if eq .State.String "overdue"}} over{{else if eq .State.String "soon"}} warn{{end}}" value="{{.Percent}}" max="100" aria-hidden="true"></progress>{{end}}{{end}}
+
+{{/* Files of a ride import that could not be read. */}}
+{{define "file-errors"}}{{with .}}<div role="alert"><ul>{{range .}}<li>{{.Name}}: {{.Message}}</li>{{end}}</ul></div>{{end}}{{end}}
+
+{{/* Preview of a store.Attachment: the thumbnail of an image, a tile for
+     other files. */}}
+{{define "attachment-preview"}}{{if .HasThumb}}<img src="/attachments/{{.ID}}/thumb" alt="" loading="lazy">{{else}}<span class="doc" aria-hidden="true">{{t "attachments.pdf"}}</span>{{end}}{{end}}
+
+{{/* Photos and documents of a bike or component: "Target" is the
+     attachTarget, "Items" its attachments. */}}
+{{define "attachments"}}
+<section id="attachments">
+  <div class="page-head">
+    <h2>{{t "attachments.title"}}</h2>
+    <div class="actions">
+      <a href="{{.Target.Path}}/attachments/link" role="button" class="outline">{{t "attachments.link"}}</a>
+      <a href="{{.Target.Path}}/attachments/new" role="button" title="{{t "attachments.new"}}">+ {{t "action.new"}}</a>
+    </div>
+  </div>
+  {{if .Items}}
+  <ul class="attachments">
+    {{range .Items}}
+    <li>
+      <a href="/attachments/{{.ID}}" class="preview" title="{{.Name}}"{{if not .HasThumb}} target="_blank" rel="noopener"{{end}}>{{template "attachment-preview" .}}</a>
+      <small class="name">{{.Name}}</small>
+      {{if .Cover}}<span class="badge done">{{t "attachments.cover"}}</span>{{end}}
+      <div class="row-action">
+        {{if and $.Target.BikeID .HasThumb (not .Cover)}}<form method="post" action="/bikes/{{$.Target.BikeID}}/cover"><input type="hidden" name="attachment" value="{{.ID}}"><button type="submit" class="outline">{{t "attachments.make_cover"}}</button></form>{{end}}
+        {{if and $.Target.BikeID .Cover}}<form method="post" action="/bikes/{{$.Target.BikeID}}/cover"><input type="hidden" name="attachment" value=""><button type="submit" class="outline">{{t "attachments.clear_cover"}}</button></form>{{end}}
+        <a href="/attachments/{{.ID}}/edit{{$.Target.Query}}" role="button" class="outline">{{t "action.edit"}}</a>
+      </div>
+    </li>
+    {{end}}
+  </ul>
+  {{else}}
+  <p>{{t "attachments.empty"}}</p>
+  {{end}}
+</section>
+{{end}}
+
+{{/* Menu icons from Lucide (lucide-static 0.460.0, ISC, see
+     static/vendor/lucide-LICENSE.md); they follow the text color. */}}
+{{define "icon-bike"}}<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>{{end}}
+{{define "icon-cog"}}<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M12 2v2"/><path d="M12 22v-2"/><path d="m17 20.66-1-1.73"/><path d="M11 10.27 7 3.34"/><path d="m20.66 17-1.73-1"/><path d="m3.34 7 1.73 1"/><path d="M14 12h8"/><path d="M2 12h2"/><path d="m20.66 7-1.73 1"/><path d="m3.34 17 1.73-1"/><path d="m17 3.34-1 1.73"/><path d="m11 13.73-4 6.93"/></svg>{{end}}
+{{define "icon-shopping-cart"}}<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>{{end}}
+{{define "icon-route"}}<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>{{end}}
+{{define "icon-list-checks"}}<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg>{{end}}
+{{define "icon-ellipsis"}}<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>{{end}}
+{{define "icon-user"}}<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>{{end}}
+{{define "icon-log-out"}}<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>{{end}}

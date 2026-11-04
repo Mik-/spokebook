@@ -1,0 +1,56 @@
+{{define "title"}}{{t "account.title"}}{{end}}
+
+{{define "content"}}
+<div class="page-head"><h1>{{t "account.title"}}</h1></div>
+<dl>
+  <dt>{{t "auth.field.name"}}</dt><dd>{{.User.Name}}</dd>
+</dl>
+
+<section>
+  <div class="page-head">
+    <h2>{{t "account.passkeys"}}</h2>
+    <a href="/account/passkeys/new" role="button" title="{{t "account.passkey.new"}}">+ {{t "action.new"}}</a>
+  </div>
+  <p>{{t "account.passkeys.hint"}}</p>
+  {{if .Passkeys}}
+  <div class="overflow-auto">
+  <table>
+    <thead>
+      <tr><th>{{t "account.passkey.field.name"}}</th><th>{{t "account.passkey.created"}}</th><th>{{t "account.passkey.last_used"}}</th><th></th></tr>
+    </thead>
+    <tbody>
+      {{range .Passkeys}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td data-label="{{t "account.passkey.created"}}">{{date .CreatedAt}}</td>
+        <td data-label="{{t "account.passkey.last_used"}}">{{with .LastUsedAt}}{{date .}}{{else}}–{{end}}</td>
+        <td class="row-action"><a href="/account/passkeys/{{.ID}}/delete" role="button" class="outline danger">{{t "action.delete"}}</a></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+  {{else}}
+  <p>{{t "account.passkeys.empty"}}</p>
+  {{end}}
+</section>
+
+<section>
+  <div class="page-head">
+    <h2>{{t "account.password"}}</h2>
+    <a href="/account/password" role="button" class="outline">{{t "account.password.change"}}</a>
+  </div>
+  <p>{{t "account.password.hint"}}</p>
+</section>
+
+<section>
+  <div class="page-head">
+    <h2>{{t "account.backup"}}</h2>
+    <div class="actions">
+      <a href="/account/backup" role="button" class="outline" download>{{t "account.backup.export"}}</a>
+      <a href="/account/backup/import" role="button" class="outline danger">{{t "account.backup.import"}}</a>
+    </div>
+  </div>
+  <p>{{t "account.backup.hint"}}</p>
+</section>
+{{end}}

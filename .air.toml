@@ -1,0 +1,8 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/spokebook ./cmd/spokebook"
+  entrypoint = ["env", "APP_LOG_LEVEL=debug", "./tmp/spokebook"]
+  include_ext = ["go", "html", "css", "sql", "json"]
+  exclude_dir = ["tmp", "data", "docs"]
