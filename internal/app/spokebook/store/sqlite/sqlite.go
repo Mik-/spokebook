@@ -14,8 +14,8 @@ import (
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store/sqlite/db"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store/sqlite/db"
 )
 
 //go:embed migrations/*.sql

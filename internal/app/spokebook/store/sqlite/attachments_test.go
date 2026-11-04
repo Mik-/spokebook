@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 func TestAttachments(t *testing.T) {

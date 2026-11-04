@@ -6,9 +6,9 @@ import (
 	"errors"
 	"slices"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/odometer"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/values"
+	"github.com/spokebook/spokebook/internal/app/spokebook/odometer"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/values"
 )
 
 // Origins are the ways a bike can be acquired, translated via

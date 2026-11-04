@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/attachments"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store/sqlite"
+	"github.com/spokebook/spokebook/internal/app/spokebook/attachments"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store/sqlite"
 )
 
 // halves returns a w×h image, red on the left half and blue on the right.

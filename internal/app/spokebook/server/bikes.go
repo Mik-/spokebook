@@ -9,11 +9,11 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/bikes"
-	"github.com/Mik-/spokebook/internal/app/spokebook/due"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/odometer"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/bikes"
+	"github.com/spokebook/spokebook/internal/app/spokebook/due"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/odometer"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // bikeRow is a bike in the overview with its odometer and warnings.

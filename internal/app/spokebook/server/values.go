@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/values"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/values"
 )
 
 // Values are edited as rows of repeated form fields. The form shows the

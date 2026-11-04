@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store/sqlite/db"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store/sqlite/db"
 )
 
 type userStore struct{ q *db.Queries }

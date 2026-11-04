@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Mik-/spokebook/web"
+	"github.com/spokebook/spokebook/web"
 )
 
 // serviceWorker serves web/sw.js with the app version in front, so a new

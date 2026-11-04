@@ -4,8 +4,8 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/catalog"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/catalog"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 func TestFilter(t *testing.T) {

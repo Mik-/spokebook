@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"slices"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/bikes"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/bikes"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
 )
 
 // bikeValueLabels are suggested labels of bike measurements, translated

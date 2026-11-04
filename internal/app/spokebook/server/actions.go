@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/components"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/components"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // This file has the form pages for actions on a component or bike:

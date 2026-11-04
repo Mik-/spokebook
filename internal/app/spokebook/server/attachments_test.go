@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/auth"
+	"github.com/spokebook/spokebook/internal/app/spokebook/auth"
 )
 
 func pngImage(t *testing.T) string {

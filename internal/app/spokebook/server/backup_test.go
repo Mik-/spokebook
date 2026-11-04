@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/auth"
+	"github.com/spokebook/spokebook/internal/app/spokebook/auth"
 )
 
 // upload posts a multipart form with the file and returns status, final

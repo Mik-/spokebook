@@ -4,7 +4,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // The special filter values: steps without a level, steps of every bike.

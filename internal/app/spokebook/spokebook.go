@@ -13,10 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/rides/garmin"
-	"github.com/Mik-/spokebook/internal/app/spokebook/secret"
-	"github.com/Mik-/spokebook/internal/app/spokebook/server"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store/sqlite"
+	"github.com/spokebook/spokebook/internal/app/spokebook/rides/garmin"
+	"github.com/spokebook/spokebook/internal/app/spokebook/secret"
+	"github.com/spokebook/spokebook/internal/app/spokebook/server"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store/sqlite"
 )
 
 // Run starts the app and blocks until ctx is done.

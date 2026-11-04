@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/auth"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/auth"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
 )
 
 func (s *Server) showAccount(w http.ResponseWriter, r *http.Request) {

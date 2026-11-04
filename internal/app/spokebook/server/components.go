@@ -11,11 +11,11 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/components"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/odometer"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/values"
+	"github.com/spokebook/spokebook/internal/app/spokebook/components"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/odometer"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/values"
 )
 
 // componentView is a component with its wear and current installation.

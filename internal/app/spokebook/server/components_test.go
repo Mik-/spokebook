@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/components"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/web"
+	"github.com/spokebook/spokebook/internal/app/spokebook/components"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/web"
 )
 
 // firstLink returns the path of the first href in body that starts with prefix,

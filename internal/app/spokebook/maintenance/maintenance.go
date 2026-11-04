@@ -12,10 +12,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/catalog"
-	"github.com/Mik-/spokebook/internal/app/spokebook/components"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/values"
+	"github.com/spokebook/spokebook/internal/app/spokebook/catalog"
+	"github.com/spokebook/spokebook/internal/app/spokebook/components"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/values"
 )
 
 // ErrCompleted means a completed maintenance can't be changed; reopen it

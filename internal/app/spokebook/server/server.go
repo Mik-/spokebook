@@ -18,12 +18,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/auth"
-	"github.com/Mik-/spokebook/internal/app/spokebook/catalog"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/rides/garmin"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/web"
+	"github.com/spokebook/spokebook/internal/app/spokebook/auth"
+	"github.com/spokebook/spokebook/internal/app/spokebook/catalog"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/rides/garmin"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/web"
 )
 
 // Files in web/templates that are not pages but parsed into every page.

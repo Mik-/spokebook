@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/secret"
+	"github.com/spokebook/spokebook/internal/app/spokebook/secret"
 )
 
 const key = "0123456789abcdef0123456789abcdef"

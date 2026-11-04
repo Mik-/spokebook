@@ -10,9 +10,9 @@ import (
 	"slices"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/catalog"
-	"github.com/Mik-/spokebook/internal/app/spokebook/odometer"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/catalog"
+	"github.com/spokebook/spokebook/internal/app/spokebook/odometer"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // State says how urgent an item is.

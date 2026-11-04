@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 type ctxKey int

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/auth"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/auth"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 func TestSetupAndLogin(t *testing.T) {

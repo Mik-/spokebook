@@ -14,7 +14,7 @@ import (
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/rides/parse"
+	"github.com/spokebook/spokebook/internal/app/spokebook/rides/parse"
 )
 
 var berlin = func() *time.Location {

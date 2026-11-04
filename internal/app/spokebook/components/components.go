@@ -8,8 +8,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/odometer"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/odometer"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // BuiltinTypes are the component types every owner starts with. Unless

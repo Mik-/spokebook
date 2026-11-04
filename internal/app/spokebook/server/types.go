@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"slices"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/components"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/components"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 func (s *Server) listTypes(w http.ResponseWriter, r *http.Request) {

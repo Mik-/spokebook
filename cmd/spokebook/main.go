@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook"
+	"github.com/spokebook/spokebook/internal/app/spokebook"
 )
 
 func main() {

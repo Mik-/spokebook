@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store/sqlite/db"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store/sqlite/db"
 )
 
 type bikeStore struct{ q *db.Queries }

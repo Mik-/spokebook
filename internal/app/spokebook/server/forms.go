@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // parseDecimal parses a non-negative decimal ("1234.5" or "1234,5") and

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"slices"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // ErrInvalidInterval means an interval limit is not positive or too large.

@@ -14,12 +14,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/attachments"
-	"github.com/Mik-/spokebook/internal/app/spokebook/backup"
-	"github.com/Mik-/spokebook/internal/app/spokebook/catalog"
-	"github.com/Mik-/spokebook/internal/app/spokebook/components"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store/sqlite"
+	"github.com/spokebook/spokebook/internal/app/spokebook/attachments"
+	"github.com/spokebook/spokebook/internal/app/spokebook/backup"
+	"github.com/spokebook/spokebook/internal/app/spokebook/catalog"
+	"github.com/spokebook/spokebook/internal/app/spokebook/components"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store/sqlite"
 )
 
 func ptr(f float64) *float64 { return &f }

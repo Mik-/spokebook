@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/server"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store/sqlite"
+	"github.com/spokebook/spokebook/internal/app/spokebook/server"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store/sqlite"
 )
 
 func TestRequestLog(t *testing.T) {

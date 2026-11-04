@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/auth"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/auth"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 const sessionCookie = "spokebook_session"

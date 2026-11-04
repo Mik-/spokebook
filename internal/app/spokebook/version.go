@@ -4,7 +4,7 @@ import "runtime/debug"
 
 // Version is set at build time:
 //
-//	go build -ldflags "-X github.com/Mik-/spokebook/internal/app/spokebook.Version=v0.1.0"
+//	go build -ldflags "-X github.com/spokebook/spokebook/internal/app/spokebook.Version=v0.1.0"
 //
 // Without it, AppVersion falls back to the commit Go records in the binary.
 var Version = ""
@@ -13,8 +13,8 @@ var Version = ""
 // AGPL asks for a network service. Point it at your copy if you change the
 // code:
 //
-//	go build -ldflags "-X github.com/Mik-/spokebook/internal/app/spokebook.SourceURL=https://example.com/spokebook"
-var SourceURL = "https://github.com/Mik-/spokebook"
+//	go build -ldflags "-X github.com/spokebook/spokebook/internal/app/spokebook.SourceURL=https://example.com/spokebook"
+var SourceURL = "https://github.com/spokebook/spokebook"
 
 // AppVersion returns Version, else the short commit hash (with "-dirty" for
 // uncommitted changes), else "dev".

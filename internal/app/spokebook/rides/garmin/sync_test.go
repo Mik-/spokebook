@@ -24,12 +24,12 @@ import (
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/odometer"
-	"github.com/Mik-/spokebook/internal/app/spokebook/rides"
-	"github.com/Mik-/spokebook/internal/app/spokebook/rides/garmin"
-	"github.com/Mik-/spokebook/internal/app/spokebook/secret"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store/sqlite"
+	"github.com/spokebook/spokebook/internal/app/spokebook/odometer"
+	"github.com/spokebook/spokebook/internal/app/spokebook/rides"
+	"github.com/spokebook/spokebook/internal/app/spokebook/rides/garmin"
+	"github.com/spokebook/spokebook/internal/app/spokebook/secret"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store/sqlite"
 )
 
 const (

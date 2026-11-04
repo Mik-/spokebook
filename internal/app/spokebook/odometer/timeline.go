@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // Timeline computes a bike's odometer from its manual readings and its

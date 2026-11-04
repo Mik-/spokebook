@@ -6,7 +6,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // Reasons for retiring, translated via "retire.reason.<reason>".

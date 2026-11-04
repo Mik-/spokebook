@@ -1,4 +1,4 @@
-module github.com/Mik-/spokebook
+module github.com/spokebook/spokebook
 
 go 1.27.3
 

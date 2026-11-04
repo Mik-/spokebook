@@ -8,7 +8,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // SessionLifetime: a session ends when it isn't used for this long.

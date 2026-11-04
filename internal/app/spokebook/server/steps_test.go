@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/auth"
+	"github.com/spokebook/spokebook/internal/app/spokebook/auth"
 )
 
 // builtinStepID returns the ID of the owner's copy of a built-in step.

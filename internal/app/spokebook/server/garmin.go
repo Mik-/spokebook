@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/rides/garmin"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/rides/garmin"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // garminSource returns the owner's Garmin connection; nil if there is

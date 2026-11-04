@@ -7,7 +7,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 var (

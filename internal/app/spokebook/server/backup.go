@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/backup"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/backup"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
 )
 
 // maxBackupMB limits the size of an uploaded backup.

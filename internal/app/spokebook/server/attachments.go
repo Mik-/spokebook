@@ -11,9 +11,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/attachments"
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/attachments"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 // maxAttachmentUploadMB limits one upload of several files.

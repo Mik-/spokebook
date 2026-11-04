@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mik-/spokebook/internal/app/spokebook/i18n"
-	"github.com/Mik-/spokebook/internal/app/spokebook/rides"
-	"github.com/Mik-/spokebook/internal/app/spokebook/rides/parse"
-	"github.com/Mik-/spokebook/internal/app/spokebook/store"
+	"github.com/spokebook/spokebook/internal/app/spokebook/i18n"
+	"github.com/spokebook/spokebook/internal/app/spokebook/rides"
+	"github.com/spokebook/spokebook/internal/app/spokebook/rides/parse"
+	"github.com/spokebook/spokebook/internal/app/spokebook/store"
 )
 
 const (
