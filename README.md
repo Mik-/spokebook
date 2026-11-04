@@ -41,13 +41,13 @@ single binary with embedded templates and migrations and needs no CGO.
 ## Running with Docker
 
 Every release is published as a container image for `linux/amd64` on the GitHub Container Registry:
-`ghcr.io/mik-/spokebook` with the tags `<version>` (e.g. `0.3.0`), `<major>.<minor>` and `latest`.
+`ghcr.io/spokebook/spokebook` with the tags `<version>` (e.g. `0.3.0`), `<major>.<minor>` and `latest`.
 The image listens on port 8080 and keeps its database in `/data`; it runs as user 65532 by default.
 
 ```yaml
 services:
   spokebook:
-    image: ghcr.io/mik-/spokebook:latest
+    image: ghcr.io/spokebook/spokebook:latest
     restart: unless-stopped
     user: "568:568"            # optional, e.g. the TrueNAS "apps" user; must own ./data
     ports:

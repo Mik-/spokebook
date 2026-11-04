@@ -65,7 +65,7 @@ jobs:
       contents: read
       packages: write
     env:
-      IMAGE: ghcr.io/mik-/spokebook
+      IMAGE: ghcr.io/spokebook/spokebook
     steps:
       - uses: actions/checkout@v5
         with:
